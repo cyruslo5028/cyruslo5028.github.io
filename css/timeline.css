@@ -1,7 +1,7 @@
 
 .aboutme-heading{
   padding-top: 30px;
-  font-size: 40px;
+  font-size: 50px;
   color:white;
   background-color: #111;
 }
@@ -16,6 +16,55 @@
   background-color: #111;
 }
 
+.skills{
+  color:white;
+  background-color: #111;
+  padding-bottom: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.skills-content{
+  background-color: #1e1f22;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  width: 70%;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  word-spacing: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.skills-content .text{
+  color: white;
+  font-size: 25px;
+  padding-left: 20px;
+  padding-right:20px;
+  padding-top: 20px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  transition: all 0.3s ease;
+}
+
+.skills-content .text:hover{
+  color: white;
+  font-size: 30px;
+  padding-left: 20px;
+  padding-right:20px;
+  padding-top: 20px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  transition: all 0.3s ease;
+}
 
 .timeline {
   width: 80%;
@@ -43,6 +92,16 @@
   font-size: 25px;
   line-height: 30px;
   margin-bottom: 10px;
+}
+
+.timeline-content{
+  transition: all 0.3s ease;
+}
+
+.timeline-content:hover{
+  transition: all 0.3s ease;
+  height:auto;
+  padding-block: 10px;
 }
 .timeline-content h2 {
   font-weight: 500;
