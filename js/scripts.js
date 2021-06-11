@@ -5,3 +5,9 @@
 */
 // This file is intentionally blank
 // Use this file to add JavaScript to your project
+
+function resume(){
+    let url = window.location.href;
+    window.location.replace("https://cyruslo.co/assets/Resume.pdf");
+}
+

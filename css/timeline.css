@@ -1,8 +1,126 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+.button2 {
+	position: relative;
+	display: inline-block;
+	padding: 20px 41px;
+	border-radius: 8px;
+  color: #fcfcfc;
+  letter-spacing: 2px;
+	text-decoration: none;
+	text-transform: uppercase;
+	overflow: hidden;
+	margin: 25px;
+	font-family: "Roboto", sans-serif;
+	filter: hue-rotate(0deg);
+	border: 2px solid #d2bdff;
+	transition: all 0.1s linear;
+}
+
+.button2:hover {
+	border: 1px solid transparent;
+}
+
+.button2:hover span {
+	position: absolute;
+	display: block;
+}
+
+.button2:hover span:nth-child(1) {
+	filter: hue-rotate(0deg);
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 3px;
+	background: linear-gradient(90deg, transparent, #3a86ff);
+	animation: animate1 1s linear infinite;
+}
+
+@keyframes animate1 {
+	0% {
+		left: -100%;
+	}
+
+	50%,
+  100% {
+		left: 100%;
+	}
+}
+
+.button2:hover span:nth-child(2) {
+	filter: hue-rotate(60deg);
+	top: -100%;
+	right: 0;
+	width: 3px;
+	height: 100%;
+	background: linear-gradient(180deg, transparent, #3a86ff);
+	animation: animate2 1s linear infinite;
+	animation-delay: 0.25s;
+}
+
+@keyframes animate2 {
+	0% {
+		top: -100%;
+	}
+
+	50%,
+  100% {
+		top: 100%;
+	}
+}
+
+.button2:hover span:nth-child(3) {
+	filter: hue-rotate(120deg);
+	bottom: 0;
+	right: 0;
+	width: 100%;
+	background: linear-gradient(270deg, transparent, #3a86ff);
+	animation: animate3 1s linear infinite;
+	animation-delay: 0.5s;
+}
+
+@keyframes animate3 {
+	0% {
+		right: -100%;
+		height: 3px;
+	}
+
+	50%,
+  100% {
+		height: 2px;
+		right: 100%;
+	}
+}
+
+.button2:hover span:nth-child(4) {
+	filter: hue-rotate(300deg);
+	bottom: -100%;
+	left: 0;
+	width: 3px;
+	height: 100%;
+	background: linear-gradient(360deg, transparent, #3a86ff);
+	animation: animate4 1s linear infinite;
+	animation-delay: 0.75s;
+}
+
+@keyframes animate4 {
+	0% {
+		bottom: -100%;
+	}
+
+	50%,
+  100% {
+		bottom: 100%;
+	}
+}
 
 .aboutme-heading{
   padding-top: 30px;
   font-size: 50px;
   color:white;
+  background-color: #111;
+}
+
+.bk-bg{
   background-color: #111;
 }
 
@@ -20,6 +138,7 @@
   color:white;
   background-color: #111;
   padding-bottom: 30px;
+  margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -29,18 +148,20 @@
   background-color: #1e1f22;
   border-radius: 10px;
   margin-bottom: 20px;
-  width: 70%;
+  width: 60%;
   padding-top: 10px;
   padding-bottom: 10px;
   word-spacing: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .skills-content .text{
   color: white;
   font-size: 25px;
+  flex-basis: 33.333333%;
   padding-left: 20px;
   padding-right:20px;
   padding-top: 20px;
@@ -55,6 +176,7 @@
 .skills-content .text:hover{
   color: white;
   font-size: 30px;
+  font-weight: 700;
   padding-left: 20px;
   padding-right:20px;
   padding-top: 20px;

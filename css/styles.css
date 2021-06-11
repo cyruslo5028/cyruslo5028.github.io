@@ -10916,6 +10916,7 @@ textarea.form-control-lg {
   align-items: center;
   flex-direction: column;
   cursor: pointer;
+  flex-basis: 33.333333%;
   transition: all 0.3s ease;
 }
 
@@ -10978,5 +10979,4 @@ textarea.form-control-lg {
   opacity: 1;
   max-height:40px;
 }
-
 
