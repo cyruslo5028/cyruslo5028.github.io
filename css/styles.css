@@ -10996,6 +10996,11 @@ textarea.form-control-lg {
   transition: all 0.3s ease;
 }
 
+.project-card .project-text b{
+  font-weight: 500;
+  color: rgb(30, 188, 236);
+}
+
 .project-card:hover {
   height: 300px;
 }
