@@ -4650,6 +4650,7 @@ textarea.form-control-lg {
   white-space: nowrap;
   vertical-align: baseline;
   border-radius: 0.25rem;
+  background-color:#1e1f22 ;
 }
 .badge:empty {
   display: none;
@@ -10952,6 +10953,35 @@ textarea.form-control-lg {
   letter-spacing: 4px;
 }
 
+.project-content .project-tags{
+  width: 70%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.project-card .project-tag {
+  margin: 5px;
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 0.6em;
+  color: white;
+  background-color:#1e1f22 ;
+  text-align: center;
+  white-space: nowrap;
+  border-radius: 0.25rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  padding: 0.35em 0.65em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+
 .project-card .project-text {
   width: 80%;
   margin: 0 auto;
@@ -10967,7 +10997,7 @@ textarea.form-control-lg {
 }
 
 .project-card:hover {
-  height: 270px;
+  height: 300px;
 }
 
 .project-card:hover .project-info {
