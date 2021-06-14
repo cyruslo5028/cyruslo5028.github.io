@@ -404,5 +404,12 @@
   }
   .timeline ul li:hover::before {
     background-color: rgb(207, 208, 211);
+    box-shadow:
+    0 0 10px rgb(13, 48, 245),
+    0 0 16px rgb(13, 48, 245),
+    0 0 72px rgb(13, 48, 245),
+    0 0 82px rgb(13, 48, 245),
+    0 0 90px rgb(13, 48, 245),
+    0 0 100px rgb(13, 48, 245);
   }
 }
