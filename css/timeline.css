@@ -115,7 +115,8 @@
 
 .aboutme-heading{
   padding-top: 30px;
-  font-size: 50px;
+  padding-bottom: 10px;
+  font-size: 30px;
   color:white;
   background-color: #111;
 }
@@ -169,7 +170,7 @@
   padding-top: 20px;
   position: relative;
   white-space: normal;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 }
 .course:hover .title{
   color: white;
@@ -179,7 +180,7 @@
   padding-right:20px;
   padding-top: 20px;
   position: relative;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   /*
   text-shadow:
     0 0 10px #fff,

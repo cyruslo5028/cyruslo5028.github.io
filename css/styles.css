@@ -10959,6 +10959,7 @@ textarea.form-control-lg {
 
 .project-content .project-tags{
   width: 70%;
+  padding-top:5px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -10997,6 +10998,7 @@ textarea.form-control-lg {
   letter-spacing: 2px;
   opacity: 0;
   max-height:0;
+  flex-wrap: wrap;
   transition: all 0.3s ease;
 }
 
@@ -11016,6 +11018,6 @@ textarea.form-control-lg {
 .project-card:hover .project-text {
   transition: all 0.3s ease;
   opacity: 1;
-  max-height:40px;
+  max-height:100em;
 }
 
