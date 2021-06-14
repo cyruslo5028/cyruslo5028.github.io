@@ -1,13 +1,22 @@
-/*!
-* Start Bootstrap - Full Width Pics v5.0.1 (https://startbootstrap.com/template/full-width-pics)
-* Copyright 2013-2021 Start Bootstrap
-* Licensed under MIT (https://github.com/StartBootstrap/startbootstrap-full-width-pics/blob/master/LICENSE)
-*/
-// This file is intentionally blank
-// Use this file to add JavaScript to your project
 
 function resume(){
     let url = window.location.href;
     window.location.replace("https://cyruslo.co/assets/Resume.pdf");
 }
 
+function sendEmail(){
+    console.log("Submiting Message");
+    email = document.getElementById("email").value;
+    message = document.getElementById("message").value;
+    body = "From: "+email+"\nMessage: "+message;
+    
+    Email.send({
+        SecureToken:"a61bf697-e600-4199-a647-9fb5a76566be",
+        To : 'chakwah09@yahoo.com.hk',
+        From : "cyruslo5028@cyruslo.co",
+        Subject : "You got a message from your Website.",
+        Body :body ,
+        }).then(
+            message => alert("mail sent successfully")
+        );
+}

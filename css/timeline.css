@@ -2,13 +2,14 @@
 .button2 {
 	position: relative;
 	display: inline-block;
-	padding: 20px 41px;
+	padding: 20px;
 	border-radius: 8px;
   color: #fcfcfc;
   letter-spacing: 2px;
 	text-decoration: none;
 	text-transform: uppercase;
-	overflow: hidden;
+  overflow: hidden;
+  text-align: center;
 	margin: 25px;
 	font-family: "Roboto", sans-serif;
 	filter: hue-rotate(0deg);

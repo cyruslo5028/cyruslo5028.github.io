@@ -6567,6 +6567,10 @@ textarea.form-control-lg {
   border-width: 5px !important;
 }
 
+.w-15 {
+  width: 15% !important;
+}
+
 .w-25 {
   width: 25% !important;
 }
@@ -7533,6 +7537,9 @@ textarea.form-control-lg {
 }
 
 @media (min-width: 576px) {
+  .w-sm-25{
+    width: 25% !important;
+  }
   .float-sm-start {
     float: left !important;
   }
@@ -8184,6 +8191,9 @@ textarea.form-control-lg {
   }
 }
 @media (min-width: 768px) {
+  .w-md-25{
+    width: 25% !important;
+  }
   .float-md-start {
     float: left !important;
   }
@@ -8835,6 +8845,9 @@ textarea.form-control-lg {
   }
 }
 @media (min-width: 992px) {
+  .w-lg-15{
+    width: 15% !important;
+  }
   .float-lg-start {
     float: left !important;
   }
