@@ -27,6 +27,7 @@ function promptUser(formSubmitEvent){
         }
         rowHTML += "<input type='submit' class='btn btn-primary btn-dark mb-2' value='Submit' ></input>";
         nameInput.append(rowHTML);
+        nameInput.css('display','block');
     }
 }
 
@@ -41,11 +42,11 @@ function updatePrice(){
             }
             price = (Math.round(price * 100) / 100).toFixed(2);
             let label = $('#priceLabel'+i);
-            label.html("Price:$"+price);
+            label.html("Price: $"+price);
         }
         catch{
             let label = $('#priceLabel'+i);
-            label.html("Price:$0.00");
+            label.html("Price: $0.00");
         }
     }
     let taxValue = $('#tax').val();
@@ -56,11 +57,11 @@ function updatePrice(){
         }
         tax = (Math.round(tax * 100) / 100).toFixed(2);
         let label = $('#taxLabel');
-        label.html("Tax+Tips:$"+tax);
+        label.html("Tax+Tips: $"+tax);
     }
     catch{
         let label = $('#taxLabel');
-        label.html("Tax+Tips:$0.00");
+        label.html("Tax+Tips: $0.00");
     }
 }
 
@@ -78,22 +79,23 @@ function askPrice(formSubmitEvent){
     rowHTML = "";
     for(let i=0;i<numberppl;++i){
         rowHTML +="<div class = 'form-group row my-2'>"+
-                        "<label class='col-sm-2 col-form-label'>"+users[i]+"</label>"+
-                        "<div class='col-sm-10'>"+
+                        "<label class='col-sm-4 col-form-label'>"+users[i]+"</label>"+
+                        "<div class='col-sm-8'>"+
                             "<input type='text' class='form-control' placeholder='Price(e.g. 15.2 or 15.2+10.5)' id='price"+i+"'>"+
                         "</div>"+
                     "</div>"+
-                    "<div class= 'row my-2 mx-2' id='priceLabel"+i+"'> Price:$0.00</div>";
+                    "<div class= 'row my-2 mx-1' id='priceLabel"+i+"'> Price: $0.00</div>";
                         
     }
     rowHTML +="<div class = 'form-group row my-2'>"+
-                    "<label class='col-sm-2 col-form-label'>Tax + Tips</label>"+
-                    "<div class='col-sm-10'>"+
+                    "<label class='col-sm-4 col-form-label'>Tax + Tips</label>"+
+                    "<div class='col-sm-8'>"+
                         "<input type='text' class='form-control' placeholder='Tax+Tips (e.g. 5.2 or 2+4.3)' id='tax'>"+
                     "</div>"+
-                "</div>"+"<div class= 'row my-2 mx-2' id='taxLabel'> Tax+Tips: $0.00</div>";  
+                "</div>"+"<div class= 'row my-2 mx-1' id='taxLabel'> Tax+Tips: $0.00</div>";  
     rowHTML += "<input type='submit' class='btn btn-primary btn-dark mb-2' value='Submit' ></input>";
     priceInput.append(rowHTML);
+    priceInput.css('display','block');
     // Threading to update price
     thread = setInterval(updatePrice,1000);
 }
@@ -140,6 +142,7 @@ function promptResult(formSubmitEvent){
     }
     rowHTML += "<button type='button' class='btn btn-primary btn-dark mb-2' onclick='resetPage()'>Home</button>"
     result.append(rowHTML);
+    result.css('display','block');
 }
 
 function resetPage(){
@@ -147,11 +150,11 @@ function resetPage(){
     //Clear all the form and display home page
     numberForm.css('display','block');
     nameInput.css('display','none');
-    nameInput.html("");
+    //nameInput.html("");
     priceInput.css('display','none');
-    priceInput.html("");
+    //priceInput.html("");
     result.css('display','none');
-    result.html("");
+    //result.html("");
 }
 
 numberForm.submit(promptUser);
