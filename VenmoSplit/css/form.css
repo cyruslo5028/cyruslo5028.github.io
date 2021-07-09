@@ -1,0 +1,10 @@
+.form-container {
+    background-color: #6c757d;
+    align-items: center;
+    padding-top:5px;
+    width:50%;
+    border-radius: 10px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+}

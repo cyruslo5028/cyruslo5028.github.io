@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <title>VenmoSplit by Cyrus Lo</title>
+        <link href="css/form.css" rel="stylesheet"/>
+        <link href="css/styles.css" rel="stylesheet" />
+    </head>
+    <body>
+        <div class="text-center" >
+            <h2>Venmo Split</h2>
+        </div>
+
+        <div class="form-container container w-60">
+            <!-- Form to Prompt Number of People-->
+            <form id = "pplNumber">
+                <div class="pt-2 pb-4">
+                    <label><b>Number of People</b></label>
+                    <label><b>(Inclubed youself)</b></label>
+                    <input type ="number" min="2" class="form-control" placeholder="Number (e.g. 1, 2, 3...)" id="number" required>
+                    <input type="submit" class="btn btn-primary btn-dark mt-2" value="Submit" >
+                </div>
+            </form>
+            <!--Prompt User input the Name-->
+            <form id = "nameInput">
+            </form>
+            <!--Prompt User input the Name-->
+            <form id = "priceInput">
+            </form>
+            <!--Prompt User input the Name-->
+            <form id = "result">
+            </form>            
+        </div>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+        <!-- include script.js-->
+        <script src="js/script.js"></script>
+    </body>
+</html>
