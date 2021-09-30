@@ -139,14 +139,17 @@
 .courses{
   color:white;
   padding-bottom: 30px;
-  align-items: center;
-  justify-content: center;
   background-color: #111;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   white-space: normal;
+}
+
+.aboutme-heading:hover{
+  color: rgb(44, 128, 255);
+  cursor:pointer;
 }
 
 .courses-content{
@@ -173,8 +176,10 @@
   white-space: normal;
   transition: all 0.3s ease;
 }
-.course:hover .title{
-  color: white;
+.course .title:hover{
+  color: rgb(44, 128, 255);
+  cursor: pointer;
+  /*
   font-size: 27px;
   font-weight: 700;
   padding-left: 20px;
@@ -182,7 +187,6 @@
   padding-top: 20px;
   position: relative;
   transition: all 0.3s ease;
-  /*
   text-shadow:
     0 0 10px #fff,
     0 0 16px #fff,
@@ -191,35 +195,34 @@
     0 0 90px rgb(35, 109, 247),
     0 0 100px rgb(35, 109, 247);
   */
-  
 }
 
 .courses .description{
-  opacity: 0;
+  opacity: 1;
+  max-height:150em;
   color: rgb(114, 114, 114);
   z-index: 1;
   font-size: 20px;
-  max-height: 0;
   word-spacing: 1px;
   padding-left: 40px;
   padding-right:40px;
   position: relative;
-  transition: all 0.3s ease;
 
 }
 
-.course:hover .description{
+/* .course:hover .description{
   transition: all 0.3s ease;
   opacity: 1;
   max-height:150em;
-}
+} */
 
 .courses .grade{
-  opacity: 0;
+  opacity: 1;
   max-height: 0;
   transition: all 0.3s ease;
   font-size: 20px;
   word-spacing: 1px;
+  padding-bottom: 10px;
   text-shadow:
   0 0 10px #fff,
   0 0 16px #fff,
@@ -229,11 +232,11 @@
   0 0 100px rgb(35, 109, 247);
 }
 
-.course:hover .grade{
+/* .course:hover .grade{
   transition: all 0.3s ease;
   opacity: 1;
   padding-bottom: 10px;
-}
+} */
 
 .skills{
   color:white;

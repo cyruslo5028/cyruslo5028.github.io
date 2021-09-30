@@ -77,8 +77,8 @@
               </ul>
             </div>
         </div>
-        <div class = "aboutme-heading text-center">Courses Taken</div>
-        <div class="courses">
+        <div class = "aboutme-heading text-center" onClick = "openCourse()">Courses Taken</div>
+        <div class="courses" id = "courses" style="display:none">
                 <div class = "courses-content container w-60">
                     <div class = "row row-cols-md-auto">
                         <div class = "col-12">
@@ -196,9 +196,9 @@
                     </div>
             </div>
         </div>
-        <div class = "aboutme-heading text-center">Skills</div>
-        <div class="skills">
-            <div class="skills-content text-center">
+        <div class = "aboutme-heading text-center" onClick = "openSkills()">Skills</div>
+        <div class="skills" id = "skillsContent" style="display:none">
+            <div class="skills-content container w-60 text-center">
                 <p class="text">C/C++</p>
                 <p class="text">Python3</p>
                 <p class="text">Java</p>
@@ -214,6 +214,9 @@
                 <p class="text">Lisp</p>
                 <p class="text">Prolog</p>
                 <p class="text">Unity</p>
+                <p class="text">React</p>
+                <p class="text">React Native</p>
+
             </div>
         </div>
         <div class = "bk-bg text-center">

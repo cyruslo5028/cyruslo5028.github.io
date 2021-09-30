@@ -1,3 +1,5 @@
+let coursesOpened = false;
+let skillsOpened = false;
 
 function resume(){
     let url = window.location.href;
@@ -19,4 +21,26 @@ function sendEmail(){
         }).then(
             message => alert("mail sent successfully")
         );
+}
+
+function openCourse(){
+    content = document.getElementById("courses");
+    coursesOpened = !coursesOpened;
+    if(!coursesOpened){
+        content.style.display = "none";
+    }
+    else{
+        content.style.display = "block";
+    }
+}
+
+function openSkills(){
+    content = document.getElementById("skillsContent");
+    skillsOpened = !skillsOpened;
+    if(!skillsOpened){
+        content.style.display = "none";
+    }
+    else{
+        content.style.display = "block";
+    }
 }
