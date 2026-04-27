@@ -3,18 +3,14 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - master   # 每次 push master 自动触发
-
-  # 允许手动从 Actions tab 触发
+      - master
   workflow_dispatch:
 
-# 设置 GITHUB_TOKEN 权限以允许部署到 GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# 只允许一个并发部署，跳过排队中的任务
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -30,10 +26,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: "npm"
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          rm -rf node_modules package-lock.json
+          npm install          
 
       - name: Build
         run: npm run build
