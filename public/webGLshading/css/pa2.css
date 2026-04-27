@@ -1,0 +1,266 @@
+:root {
+  --bg: #0a0a0a;
+  --bg2: #111111;
+  --bg3: #1a1a1a;
+  --text: #f0f0f0;
+  --muted: #888888;
+  --line: rgba(255, 255, 255, 0.10);
+  --line2: rgba(255, 255, 255, 0.15);
+  --panel: rgba(17, 17, 17, 0.55);
+  --shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 18px 60px rgba(0, 0, 0, 0.55);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  background: radial-gradient(900px circle at 10% 10%, rgba(42, 58, 74, 0.22), transparent 55%),
+    radial-gradient(700px circle at 90% 30%, rgba(255, 255, 255, 0.08), transparent 60%),
+    radial-gradient(600px circle at 70% 90%, rgba(42, 58, 74, 0.18), transparent 55%),
+    var(--bg);
+  color: var(--text);
+}
+
+a {
+  color: inherit;
+}
+
+.topbar {
+  padding: 28px 22px 14px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.title-block {
+  max-width: 900px;
+}
+
+.kicker {
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+h1 {
+  margin: 6px 0 0;
+  font-size: 26px;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+
+.subtitle {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.meta-pill {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.layout {
+  padding: 0 22px 26px;
+}
+
+.stage {
+  position: relative;
+  min-height: min(76vh, 760px);
+  border-radius: 22px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.35);
+  box-shadow: var(--shadow);
+}
+
+#canvas0 {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.controls {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: min(360px, calc(100% - 32px));
+  display: grid;
+  gap: 12px;
+}
+
+.panel {
+  padding: 14px 14px 12px;
+  border-radius: 16px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.panel-title {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+}
+
+.row label {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.row .checkbox {
+  grid-column: 1 / -1;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+  font-size: 12px;
+}
+
+select,
+input[type="text"],
+input[type="number"] {
+  width: 100%;
+  appearance: none;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 10px 10px;
+  font-size: 12px;
+  outline: none;
+}
+
+select:focus,
+input[type="text"]:focus {
+  border-color: var(--line2);
+}
+
+select {
+  background-image: linear-gradient(45deg, transparent 50%, rgba(240, 240, 240, 0.6) 50%),
+    linear-gradient(135deg, rgba(240, 240, 240, 0.6) 50%, transparent 50%);
+  background-position: calc(100% - 16px) calc(50% - 2px), calc(100% - 11px) calc(50% - 2px);
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+
+.slider {
+  display: grid;
+  gap: 6px;
+}
+
+.value {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+input[type="range"] {
+  width: 100%;
+}
+
+input[type="checkbox"] {
+  accent-color: rgba(240, 240, 240, 0.8);
+}
+
+.color {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.swatch-text {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.divider {
+  grid-column: 1 / -1;
+  height: 1px;
+  background: var(--line);
+  margin: 8px 0 2px;
+}
+
+/* Spectrum (color picker) – make it match the dark UI */
+.sp-container {
+  background: #0f0f0f !important;
+  border: 1px solid var(--line) !important;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 24px 80px rgba(0, 0, 0, 0.65) !important;
+}
+
+.sp-container,
+.sp-container button,
+.sp-container input {
+  font-family: inherit !important;
+}
+
+.sp-button-container button {
+  border-radius: 10px !important;
+  border: 1px solid var(--line) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: var(--text) !important;
+}
+
+.sp-button-container button:hover {
+  background: rgba(255, 255, 255, 0.10) !important;
+}
+
+/* Responsive: panel becomes bottom sheet */
+@media (max-width: 900px) {
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .controls {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    top: auto;
+    bottom: 12px;
+    width: auto;
+  }
+
+  .stage {
+    min-height: 80vh;
+  }
+
+  .row {
+    grid-template-columns: 1fr;
+  }
+}

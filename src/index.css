@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  Global style goals (per user request):
+  - 黑/深灰主背景 + 霓虹渐变高亮（紫/蓝/青的微光）
+  - 近白主文字 + 中灰次级文字
+  - 极细灰色边框/分割线 + 玻璃拟态
+*/
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #0a0a0a;
+  color: #f0f0f0;
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial,
+    'Apple Color Emoji',
+    'Segoe UI Emoji';
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  height: 100%;
+}
+
+/* Subtle selection */
+::selection {
+  background: rgba(34, 211, 238, 0.16);
+}
+
+/* A tiny helper: hide scrollbar without breaking scroll */
+.no-scrollbar::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+@layer components {
+  .glass {
+    @apply border border-line-softer bg-ink-100/50 backdrop-blur-md;
+  }
+
+  .glass-neon {
+    @apply relative border border-line-softer bg-ink-100/45 backdrop-blur-md;
+  }
+
+  .glass-neon::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, rgba(34, 211, 238, 0.30), rgba(96, 165, 250, 0.18), rgba(167, 139, 250, 0.26));
+    opacity: 0.16;
+    filter: blur(18px);
+    pointer-events: none;
+  }
+
+  .hairline {
+    @apply border border-line-softer;
+  }
+
+  .muted {
+    @apply text-text-secondary;
+  }
+
+  .headline {
+    @apply text-text-primary tracking-tight;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition;
+  }
+
+  .btn-primary {
+    @apply btn border border-line-subtle bg-white/5 text-text-primary hover:bg-white/10 hover:shadow-neon;
+  }
+
+  .btn-ghost {
+    @apply btn border border-transparent bg-transparent text-text-secondary hover:bg-white/5 hover:text-text-primary;
+  }
+
+  .btn-neon {
+    @apply btn border border-line-subtle bg-[linear-gradient(90deg,rgba(34,211,238,0.16),rgba(96,165,250,0.12),rgba(167,139,250,0.16))] text-text-primary hover:bg-[linear-gradient(90deg,rgba(34,211,238,0.22),rgba(96,165,250,0.18),rgba(167,139,250,0.22))] hover:shadow-neon;
+  }
+
+  .text-neon {
+    @apply bg-[linear-gradient(90deg,#f0f0f0,rgba(96,165,250,0.95),rgba(34,211,238,0.9),rgba(167,139,250,0.85))] bg-[length:220%_220%] bg-clip-text text-transparent animate-shimmer;
+  }
+}

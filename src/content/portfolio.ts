@@ -1,0 +1,118 @@
+import type { PortfolioContent } from './types'
+
+export const portfolioContent: PortfolioContent = {
+  name: 'Cyrus Lo',
+  headline: 'Tech Lead — Payments Reliability (SRE), TikTok USDS',
+  location: 'Los Angeles, CA',
+  intro:
+    'Tech Lead in TikTok USDS Payments, focused on reliability, backend systems, and operational excellence. I build and operate PCI-scoped services, observability pipelines, and automation to keep high-volume fintech workloads safe and available. I have also worked on production LLM inference pipelines, LLM-powered scoring/ranking, and ReAct-style AI agents for internal engineering tooling. Interests: golf and cars.',
+  socials: [
+    { label: 'GitHub', href: 'https://github.com/cyruslo5028', kind: 'github' },
+    { label: 'Email', href: 'mailto:cyruslo5028@cyruslo.co', kind: 'email' },
+    { label: 'Website', href: 'https://cyruslo.co', kind: 'website' },
+  ],
+  projects: [
+    {
+      title: 'War of Tank',
+      description: 'A small Unity / C# arcade shooter (WebGL build).',
+      tags: ['C#', 'Unity'],
+      href: '/waroftank/index.html',
+      note: 'Legacy WebGL build (kept as-is).',
+    },
+    {
+      title: 'WebGL Real-time Shading Demo',
+      description:
+        'A real-time shading demo with multiple BRDFs (Diffuse, Phong, Blinn-Phong, Microfacet).',
+      tags: ['WebGL', 'Rendering', 'Tech Demo'],
+      href: '/webGLshading/index.html',
+    },
+    {
+      title: 'Clubhouse Music Bot',
+      description: 'A Python bot built on top of community APIs and Spotify integration.',
+      tags: ['Python', 'API'],
+      href: 'https://github.com/cyruslo5028/clubhouse_client',
+    },
+    {
+      title: 'AnimalSplit',
+      description: 'A bill-splitting web app with a simple workflow and persistence.',
+      tags: ['React', 'JavaScript', 'MongoDB'],
+      href: 'https://animalsplit.com/',
+    },
+    {
+      title: 'VenmoSplit',
+      description: 'A split-bill utility with tax/tips support and per-person totals.',
+      tags: ['JavaScript', 'Tool'],
+      href: '/VenmoSplit/index.html',
+      note: 'Modern UI; calculation logic preserved.',
+    },
+  ],
+  skills: [
+    'Go',
+    'Python',
+    'Java',
+    'TypeScript / JavaScript',
+    'SQL (MySQL)',
+    'AWS',
+    'Linux',
+    'Docker',
+    'Kubernetes',
+    'Terraform',
+    'Distributed Systems',
+    'SRE / Incident Response',
+    'SLO/SLA',
+    'Observability (Grafana/Prometheus)',
+    'CI/CD',
+    'HTTP/gRPC',
+    'PCI / Security',
+    'LLM Inference',
+    'LangChain',
+    'LangGraph',
+    'ReAct-style Agents',
+    'Ranking & Recommendation',
+    'Feature Engineering',
+  ],
+  timeline: [
+    {
+      date: 'Nov 2022 — Present',
+      title: 'Tech Lead, Payments Reliability',
+      org: 'TikTok USDS',
+      bullets: [
+        'Lead reliability initiatives for a high-volume payments platform across multiple services.',
+        'Own operational readiness for PCI-scoped workloads in a regulated environment.',
+        'Build observability, automation, and tooling to reduce MTTR and improve availability/latency.',
+        'Shipped LLM-powered scoring/ranking and AI agent tooling for internal engineering workflows (details omitted).',
+      ],
+    },
+    {
+      date: 'Feb 2022 — Nov 2022',
+      title: 'Site Reliability Engineer, Payments',
+      org: 'TikTok USDS',
+      bullets: [
+        'Oncall and incident response for payments services; drove RCA and post-incident improvements.',
+        'Developed Go-based reliability tooling and service-level improvements.',
+        'Maintained deployment pipelines and monitored SLIs/SLOs via dashboards and alerting.',
+      ],
+    },
+    {
+      date: 'Jul 2021 — Dec 2021',
+      title: 'Software Development Engineer',
+      org: 'ArcLight Software LLC',
+      bullets: [
+        'Shipped product features in React and React Native.',
+        'Built backend services on AWS (EC2/S3) and maintained MongoDB persistence.',
+      ],
+    },
+    {
+      date: '2019 — 2021',
+      title: 'B.S. Computer Science',
+      org: 'University of California, Irvine',
+      bullets: ['GPA: 3.63'],
+    },
+    {
+      date: '2016 — 2019',
+      title: 'Computer Science (Transfer Program)',
+      org: 'Fullerton College',
+      bullets: ['GPA: 4.00'],
+    },
+  ],
+}
