@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 import type { Project } from '../../../content/types'
 
 function isExternal(href: string) {
-  return href.startsWith('http://') || href.startsWith('https://')
+  return href.startsWith('http://') || href.startsWith('https://') || href.endsWith('.html') || href.startsWith('/VenmoSplit') || href.startsWith('/webGLshading')
 }
 
 const cardClassName =

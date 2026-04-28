@@ -5,7 +5,7 @@ export const GRID_COLS = GAME_WIDTH / CELL_SIZE
 export const GRID_ROWS = GAME_HEIGHT / CELL_SIZE
 
 export const PLAYER_RADIUS = 16
-export const ENEMY_RADIUS = 15
+export const ENEMY_RADIUS = 18
 export const PLAYER_SPAWN = { x: GAME_WIDTH / 2, y: GAME_HEIGHT / 2 }
 
 export const BASE_PLAYER_SPEED = 208
@@ -14,7 +14,7 @@ export const BASE_FIRE_COOLDOWN = 0.34
 export const MIN_FIRE_COOLDOWN = 0.08
 export const BASE_PLAYER_BULLET_DAMAGE = 18
 export const BASE_ENEMY_HP = 34
-export const BASE_ENEMY_SPEED = 104
+export const BASE_ENEMY_SPEED = 65
 
 export const NEON_SIGN_TEXTURES = [
   '/textures/hk-neon-nathan-road.jpg',
