@@ -38,6 +38,7 @@ export function createGameMap(seed: number): GameMap {
     stampCityBlocks(walls, random)
     stampMarketBarriers(walls, random)
     clearProtectedDistrict(walls)
+    cleanUnreachableAreas(walls)
 
     const spawnCells = collectSpawnCells(walls)
     if (spawnCells.length >= 18) {
@@ -96,6 +97,48 @@ function clearProtectedDistrict(walls: boolean[][]) {
     for (let col = center.col - 1; col <= center.col + 1; col += 1) {
       if (row > 0 && row < GRID_ROWS - 1 && col > 0 && col < GRID_COLS - 1) {
         walls[row][col] = false
+      }
+    }
+  }
+}
+
+function cleanUnreachableAreas(walls: boolean[][]) {
+  const center = worldToCell(PLAYER_SPAWN.x, PLAYER_SPAWN.y)
+  const reachable = Array.from({ length: GRID_ROWS }, () => Array.from({ length: GRID_COLS }, () => false))
+  const queue: Cell[] = [center]
+  reachable[center.row][center.col] = true
+
+  const directions = [
+    { col: 1, row: 0 },
+    { col: -1, row: 0 },
+    { col: 0, row: 1 },
+    { col: 0, row: -1 },
+  ]
+
+  for (let index = 0; index < queue.length; index += 1) {
+    const current = queue[index]
+    for (const direction of directions) {
+      const next = { col: current.col + direction.col, row: current.row + direction.row }
+      if (
+        next.col < 0 ||
+        next.col >= GRID_COLS ||
+        next.row < 0 ||
+        next.row >= GRID_ROWS ||
+        reachable[next.row][next.col] ||
+        walls[next.row][next.col]
+      ) {
+        continue
+      }
+      reachable[next.row][next.col] = true
+      queue.push(next)
+    }
+  }
+
+  // Fill unreachable empty spaces with walls
+  for (let row = 1; row < GRID_ROWS - 1; row += 1) {
+    for (let col = 1; col < GRID_COLS - 1; col += 1) {
+      if (!walls[row][col] && !reachable[row][col]) {
+        walls[row][col] = true
       }
     }
   }
@@ -180,9 +223,41 @@ function collectSpawnCells(walls: boolean[][]) {
   const spawns: Vec2[] = []
   const center = worldToCell(PLAYER_SPAWN.x, PLAYER_SPAWN.y)
 
+  // 1. Find all cells reachable from player center using BFS
+  const reachable = Array.from({ length: GRID_ROWS }, () => Array.from({ length: GRID_COLS }, () => false))
+  const queue: Cell[] = [center]
+  reachable[center.row][center.col] = true
+
+  const directions = [
+    { col: 1, row: 0 },
+    { col: -1, row: 0 },
+    { col: 0, row: 1 },
+    { col: 0, row: -1 },
+  ]
+
+  for (let index = 0; index < queue.length; index += 1) {
+    const current = queue[index]
+    for (const direction of directions) {
+      const next = { col: current.col + direction.col, row: current.row + direction.row }
+      if (
+        next.col < 0 ||
+        next.col >= GRID_COLS ||
+        next.row < 0 ||
+        next.row >= GRID_ROWS ||
+        reachable[next.row][next.col] ||
+        walls[next.row][next.col]
+      ) {
+        continue
+      }
+      reachable[next.row][next.col] = true
+      queue.push(next)
+    }
+  }
+
+  // 2. Only collect spawns from reachable empty cells
   for (let row = 1; row < GRID_ROWS - 1; row += 1) {
     for (let col = 1; col < GRID_COLS - 1; col += 1) {
-      if (walls[row][col]) {
+      if (walls[row][col] || !reachable[row][col]) {
         continue
       }
 
@@ -192,7 +267,8 @@ function collectSpawnCells(walls: boolean[][]) {
       }
 
       const spawn = cellCenter(col, row)
-      if (!collidesWithWalls(spawn.x, spawn.y, 16, { walls, spawnCells: [], signs: [] })) {
+      // Use slightly larger radius to ensure enough room for enemies
+      if (!collidesWithWalls(spawn.x, spawn.y, 18, { walls, spawnCells: [], signs: [] })) {
         spawns.push(spawn)
       }
     }
@@ -261,14 +337,35 @@ export function findSafeSpawnPosition(map: GameMap, preferred: Vec2, radius: num
 export function moveWithCollision(position: Vec2, delta: Vec2, radius: number, map: GameMap) {
   const moved = { ...position }
 
+  // Try X axis move
   moved.x += delta.x
   if (collidesWithWalls(moved.x, moved.y, radius, map)) {
+    // Push out: walk back in small steps to find the last valid X
     moved.x -= delta.x
+    const steps = Math.ceil(Math.abs(delta.x))
+    const sign = delta.x > 0 ? 1 : -1
+    for (let s = 1; s <= steps; s++) {
+      const testX = moved.x + sign * s
+      if (collidesWithWalls(testX, moved.y, radius, map)) {
+        break
+      }
+      moved.x = testX
+    }
   }
 
+  // Try Y axis move
   moved.y += delta.y
   if (collidesWithWalls(moved.x, moved.y, radius, map)) {
     moved.y -= delta.y
+    const steps = Math.ceil(Math.abs(delta.y))
+    const sign = delta.y > 0 ? 1 : -1
+    for (let s = 1; s <= steps; s++) {
+      const testY = moved.y + sign * s
+      if (collidesWithWalls(moved.x, testY, radius, map)) {
+        break
+      }
+      moved.y = testY
+    }
   }
 
   moved.x = clamp(moved.x, radius + 2, GAME_WIDTH - radius - 2)

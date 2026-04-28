@@ -517,6 +517,49 @@ function updateEffects(world: WorldState, delta: number) {
   })
 }
 
+function resolveEntityCollisions(world: WorldState) {
+  const player = world.player
+
+  for (let i = 0; i < world.enemies.length; i++) {
+    for (let j = i + 1; j < world.enemies.length; j++) {
+      const e1 = world.enemies[i]
+      const e2 = world.enemies[j]
+      const dx = e2.x - e1.x
+      const dy = e2.y - e1.y
+      const dist = Math.hypot(dx, dy)
+      const minDist = e1.radius + e2.radius
+      
+      if (dist < minDist && dist > 0.001) {
+        const overlap = minDist - dist
+        const pushX = (dx / dist) * (overlap / 2)
+        const pushY = (dy / dist) * (overlap / 2)
+        e1.x -= pushX
+        e1.y -= pushY
+        e2.x += pushX
+        e2.y += pushY
+      }
+    }
+  }
+
+  for (let i = 0; i < world.enemies.length; i++) {
+    const e = world.enemies[i]
+    const dx = e.x - player.x
+    const dy = e.y - player.y
+    const dist = Math.hypot(dx, dy)
+    const minDist = e.radius + player.radius
+
+    if (dist < minDist && dist > 0.001) {
+      const overlap = minDist - dist
+      const pushX = (dx / dist) * (overlap / 2)
+      const pushY = (dy / dist) * (overlap / 2)
+      player.x -= pushX
+      player.y -= pushY
+      e.x += pushX
+      e.y += pushY
+    }
+  }
+}
+
 function updateWorld(world: WorldState, delta: number, audio: TankGameAudio, godMode: boolean) {
   world.time += delta
   updateEffects(world, delta)
@@ -530,6 +573,7 @@ function updateWorld(world: WorldState, delta: number, audio: TankGameAudio, god
     shootPlayer(world, audio)
   }
   updateEnemies(world, delta, audio)
+  resolveEntityCollisions(world)
   updateBullets(world, delta, audio, godMode)
 
   if (world.scene === 'playing' && world.enemies.length === 0) {

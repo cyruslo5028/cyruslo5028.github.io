@@ -13,6 +13,7 @@ type TankGame3DProps = {
 
 export function TankGame3D({ godMode }: TankGame3DProps) {
   const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyKey>('normal')
+  const [cameraZoom, setCameraZoom] = useState<number>(1.0)
   const { world, upgradeOptions, startGame, selectUpgrade, handleAim, handlePointerDown, handlePointerLeave, handlePointerUp } = useTankGame({ godMode })
 
   const hpRatio = world.player.maxHp > 0 ? world.player.hp / world.player.maxHp : 0
@@ -27,6 +28,7 @@ export function TankGame3D({ godMode }: TankGame3DProps) {
       <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(168,85,247,0.18),transparent_40%)]" />
       <TankGame3DScene
         world={world}
+        cameraZoom={cameraZoom}
         onAim={handleAim}
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}
@@ -59,6 +61,18 @@ export function TankGame3D({ godMode }: TankGame3DProps) {
                 </span>
               }
             />
+            <div className="pointer-events-auto flex items-center gap-2 rounded-full border border-white/10 bg-black/35 px-3 py-1.5 backdrop-blur">
+              <span className="text-[10px] uppercase tracking-[0.22em] text-text-secondary">Zoom</span>
+              <input 
+                type="range" 
+                min="0.5" 
+                max="1.5" 
+                step="0.05" 
+                value={cameraZoom} 
+                onChange={(e) => setCameraZoom(Number.parseFloat(e.target.value))}
+                className="w-16 md:w-20 accent-cyan-400"
+              />
+            </div>
           </div>
         </div>
       </div>

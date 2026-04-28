@@ -14,13 +14,14 @@ const baseCamera = { x: 0, y: 560, z: 440 }
 
 type TankGame3DSceneProps = {
   world: WorldState
+  cameraZoom: number
   onAim: (point: { x: number; y: number }) => void
   onPointerDown: () => void | Promise<void>
   onPointerUp: () => void
   onPointerLeave: () => void
 }
 
-export function TankGame3DScene({ world, onAim, onPointerDown, onPointerUp, onPointerLeave }: TankGame3DSceneProps) {
+export function TankGame3DScene({ world, cameraZoom, onAim, onPointerDown, onPointerUp, onPointerLeave }: TankGame3DSceneProps) {
   return (
     <Canvas
       className="h-full w-full"
@@ -33,7 +34,7 @@ export function TankGame3DScene({ world, onAim, onPointerDown, onPointerUp, onPo
       onPointerLeave={onPointerLeave}
     >
       <PointerAimBridge onAim={onAim} />
-      <SceneRig shake={world.shake} />
+      <SceneRig shake={world.shake} cameraZoom={cameraZoom} />
       <color attach="background" args={['#02040a']} />
       <fog attach="fog" args={['#02040a', 520, 1180]} />
       <ambientLight color="#60a5fa" intensity={0.58} />
@@ -81,13 +82,19 @@ function PointerAimBridge({ onAim }: { onAim: (point: { x: number; y: number }) 
   return null
 }
 
-function SceneRig({ shake }: { shake: number }) {
+function SceneRig({ shake, cameraZoom }: { shake: number, cameraZoom: number }) {
   const { camera } = useThree()
 
   useFrame(() => {
     const jitterX = shake > 0 ? (Math.random() - 0.5) * shake * 1.8 : 0
     const jitterZ = shake > 0 ? (Math.random() - 0.5) * shake * 1.5 : 0
-    camera.position.set(baseCamera.x + jitterX, baseCamera.y, baseCamera.z + jitterZ)
+    // Invert zoom so larger value means closer (zoom in)
+    const distanceMultiplier = 1 / cameraZoom
+    camera.position.set(
+      (baseCamera.x + jitterX) * distanceMultiplier,
+      baseCamera.y * distanceMultiplier,
+      (baseCamera.z + jitterZ) * distanceMultiplier
+    )
     camera.lookAt(0, 0, 0)
   })
 
