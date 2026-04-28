@@ -4,6 +4,7 @@ import {
   GAME_WIDTH,
   GRID_COLS,
   GRID_ROWS,
+  NEON_SIGN_TEXTURES,
   PLAYER_SPAWN,
   type GameMap,
   type NeonSign,
@@ -11,8 +12,7 @@ import {
   type Vec2,
 } from './tankGameModel'
 
-const neonTexts = ['茶餐廳', '當鋪', '金舖', '藥房', '冰室', '麻雀館', '涼茶', '夜粥']
-const neonColors = ['#22d3ee', '#a855f7', '#fb7185', '#fb923c', '#f472b6']
+const neonTints = ['#22d3ee', '#38bdf8', '#a855f7', '#f472b6', '#fb7185']
 
 type RandomSource = () => number
 
@@ -122,7 +122,7 @@ function createFallbackMap(): GameMap {
 }
 
 function createNeonSigns(walls: boolean[][], random: RandomSource): NeonSign[] {
-  const cells: Cell[] = []
+  const candidates: Array<{ col: number; row: number; sides: NeonSign['side'][] }> = []
 
   for (let row = 1; row < GRID_ROWS - 1; row += 1) {
     for (let col = 1; col < GRID_COLS - 1; col += 1) {
@@ -130,27 +130,46 @@ function createNeonSigns(walls: boolean[][], random: RandomSource): NeonSign[] {
         continue
       }
 
-      const hasRoadNeighbor = !walls[row - 1][col] || !walls[row + 1][col] || !walls[row][col - 1] || !walls[row][col + 1]
-      if (hasRoadNeighbor) {
-        cells.push({ col, row })
+      const sides: NeonSign['side'][] = []
+      if (!walls[row - 1][col]) {
+        sides.push('north')
+      }
+      if (!walls[row + 1][col]) {
+        sides.push('south')
+      }
+      if (!walls[row][col - 1]) {
+        sides.push('west')
+      }
+      if (!walls[row][col + 1]) {
+        sides.push('east')
+      }
+
+      if (sides.length > 0) {
+        candidates.push({ col, row, sides })
       }
     }
   }
 
   const signs: NeonSign[] = []
-  const signCount = Math.min(16, cells.length)
+  const signCount = Math.min(18, candidates.length)
 
   for (let index = 0; index < signCount; index += 1) {
-    const cell = cells.splice(Math.floor(random() * cells.length), 1)[0]
-    const x = cell.col * CELL_SIZE + 6 + random() * 6
-    const y = cell.row * CELL_SIZE + 7 + random() * 8
+    const candidate = candidates.splice(Math.floor(random() * candidates.length), 1)[0]
+    const x = candidate.col * CELL_SIZE + CELL_SIZE / 2
+    const y = candidate.row * CELL_SIZE + CELL_SIZE / 2
+    const floating = random() < 0.28
+
     signs.push({
+      id: `sign-${candidate.col}-${candidate.row}-${index}`,
       x,
       y,
-      width: 24 + Math.floor(random() * 18),
-      height: 12 + Math.floor(random() * 6),
-      color: neonColors[Math.floor(random() * neonColors.length)],
-      text: neonTexts[Math.floor(random() * neonTexts.length)],
+      width: 28 + Math.floor(random() * 18),
+      height: 16 + Math.floor(random() * 12),
+      elevation: floating ? 78 + random() * 36 : 32 + random() * 22,
+      side: candidate.sides[Math.floor(random() * candidate.sides.length)],
+      floating,
+      tint: neonTints[Math.floor(random() * neonTints.length)],
+      texture: NEON_SIGN_TEXTURES[Math.floor(random() * NEON_SIGN_TEXTURES.length)],
     })
   }
 
@@ -172,7 +191,10 @@ function collectSpawnCells(walls: boolean[][]) {
         continue
       }
 
-      spawns.push(cellCenter(col, row))
+      const spawn = cellCenter(col, row)
+      if (!collidesWithWalls(spawn.x, spawn.y, 16, { walls, spawnCells: [], signs: [] })) {
+        spawns.push(spawn)
+      }
     }
   }
 
@@ -198,6 +220,42 @@ function isNearPlayerDistrict(startCol: number, startRow: number, length: number
     startRow <= center.row + 2 &&
     endRow >= center.row - 2
   )
+}
+
+export function findSafeSpawnPosition(map: GameMap, preferred: Vec2, radius: number) {
+  const clamped = {
+    x: clamp(preferred.x, radius + 2, GAME_WIDTH - radius - 2),
+    y: clamp(preferred.y, radius + 2, GAME_HEIGHT - radius - 2),
+  }
+
+  if (!collidesWithWalls(clamped.x, clamped.y, radius, map)) {
+    return clamped
+  }
+
+  const sortedCandidates = [...map.spawnCells].sort(
+    (left, right) => Math.hypot(left.x - preferred.x, left.y - preferred.y) - Math.hypot(right.x - preferred.x, right.y - preferred.y),
+  )
+
+  for (const candidate of sortedCandidates) {
+    if (!collidesWithWalls(candidate.x, candidate.y, radius, map)) {
+      return candidate
+    }
+  }
+
+  for (let row = 1; row < GRID_ROWS - 1; row += 1) {
+    for (let col = 1; col < GRID_COLS - 1; col += 1) {
+      if (isWallCell(map, col, row)) {
+        continue
+      }
+
+      const candidate = cellCenter(col, row)
+      if (!collidesWithWalls(candidate.x, candidate.y, radius, map)) {
+        return candidate
+      }
+    }
+  }
+
+  return clamped
 }
 
 export function moveWithCollision(position: Vec2, delta: Vec2, radius: number, map: GameMap) {
@@ -351,9 +409,9 @@ function circleIntersectsRect(x: number, y: number, radius: number, rect: Rect) 
 
 function mulberry32(seed: number) {
   return () => {
-    let t = (seed += 0x6d2b79f5)
-    t = Math.imul(t ^ (t >>> 15), t | 1)
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+    let value = (seed += 0x6d2b79f5)
+    value = Math.imul(value ^ (value >>> 15), value | 1)
+    value ^= value + Math.imul(value ^ (value >>> 7), value | 61)
+    return ((value ^ (value >>> 14)) >>> 0) / 4294967296
   }
 }

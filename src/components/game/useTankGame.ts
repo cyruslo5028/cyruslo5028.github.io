@@ -1,56 +1,77 @@
-import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { TankGameAudio } from './tankGameAudio'
-import { clamp, createGameMap, findPath, hasLineOfSight, moveWithCollision } from './tankGameMap'
+import { clamp, createGameMap, findPath, findSafeSpawnPosition, hasLineOfSight, moveWithCollision } from './tankGameMap'
 import {
   BASE_BULLET_SPEED,
+  BASE_ENEMY_HP,
+  BASE_ENEMY_SPEED,
   BASE_FIRE_COOLDOWN,
+  BASE_PLAYER_BULLET_DAMAGE,
   BASE_PLAYER_SPEED,
+  DIFFICULTY_PRESETS,
+  ENEMY_RADIUS,
   GAME_HEIGHT,
   GAME_WIDTH,
-  MAX_PLAYER_HP,
+  MIN_FIRE_COOLDOWN,
+  PLAYER_RADIUS,
   PLAYER_SPAWN,
   UPGRADE_LIBRARY,
   type Bullet,
+  type DifficultyKey,
   type EnemyTank,
   type Flash,
-  type TankGameView,
   type UpgradeKey,
+  type UpgradeLevels,
+  type UpgradeOptionView,
   type UpgradeState,
   type Vec2,
   type WorldState,
 } from './tankGameModel'
-import { renderTankGame } from './tankGameRenderer'
 
-const SNAPSHOT_INTERVAL = 0.08
+const BULLET_TTL = 1.75
+const PLAYER_INVULNERABLE_WINDOW = 0.55
 
-function createUpgradeState(): UpgradeState {
+function createUpgradeLevels(): UpgradeLevels {
   return {
-    scatter: false,
-    pierce: false,
-    shieldCharges: 0,
-    speedMultiplier: 1,
-    damageMultiplier: 1,
-    fireRateMultiplier: 1,
-    picks: [],
+    damageUp: 0,
+    fireRateUp: 0,
+    multishot: 0,
+    bigBullets: 0,
+    piercingBullets: 0,
+    vampirism: 0,
+    criticalHit: 0,
+    armorUp: 0,
   }
 }
 
-function createWorld(seed: number): WorldState {
+function createUpgradeState(): UpgradeState {
+  return {
+    levels: createUpgradeLevels(),
+  }
+}
+
+function createWorld(seed: number, difficulty: DifficultyKey): WorldState {
+  const map = createGameMap(seed)
+  const safeSpawn = findSafeSpawnPosition(map, PLAYER_SPAWN, PLAYER_RADIUS)
+  const difficultyConfig = DIFFICULTY_PRESETS[difficulty]
+
   return {
     scene: 'idle',
     time: 0,
     wave: 1,
     score: 0,
+    difficulty,
     nextEnemyId: 1,
     nextBulletId: 1,
-    map: createGameMap(seed),
+    nextEffectId: 1,
+    map,
     player: {
-      x: PLAYER_SPAWN.x,
-      y: PLAYER_SPAWN.y,
+      x: safeSpawn.x,
+      y: safeSpawn.y,
       angle: -Math.PI / 2,
-      radius: 16,
-      hp: MAX_PLAYER_HP,
-      maxHp: MAX_PLAYER_HP,
+      radius: PLAYER_RADIUS,
+      hp: difficultyConfig.playerMaxHp,
+      maxHp: difficultyConfig.playerMaxHp,
       cooldown: 0,
       invulnerable: 0,
     },
@@ -66,30 +87,13 @@ function createWorld(seed: number): WorldState {
       firing: false,
     },
     pointer: {
-      x: GAME_WIDTH / 2,
-      y: 120,
+      x: safeSpawn.x,
+      y: safeSpawn.y - 120,
       inside: false,
     },
     upgrades: createUpgradeState(),
     upgradeOptions: [],
     shake: 0,
-  }
-}
-
-function createView(world: WorldState): TankGameView {
-  return {
-    scene: world.scene,
-    wave: world.wave,
-    score: world.score,
-    hp: world.player.hp,
-    maxHp: world.player.maxHp,
-    shieldCharges: world.upgrades.shieldCharges,
-    upgrades: [...world.upgrades.picks],
-    upgradeOptions: world.upgradeOptions.map((key) => ({
-      key,
-      title: UPGRADE_LIBRARY[key].title,
-      description: UPGRADE_LIBRARY[key].description,
-    })),
   }
 }
 
@@ -102,43 +106,55 @@ function shuffle<T>(items: T[]) {
   return next
 }
 
-function pickUpgradeOptions(upgrades: UpgradeState) {
-  const candidates = (Object.keys(UPGRADE_LIBRARY) as UpgradeKey[]).filter((key) => {
-    if (key === 'scatter') {
-      return !upgrades.scatter
-    }
-    if (key === 'pierce') {
-      return !upgrades.pierce
-    }
-    return true
-  })
+function pickUpgradeOptions() {
+  return shuffle(Object.keys(UPGRADE_LIBRARY) as UpgradeKey[]).slice(0, 3)
+}
 
-  return shuffle(candidates).slice(0, Math.min(3, candidates.length))
+function getUpgradeLevel(world: WorldState, key: UpgradeKey) {
+  return world.upgrades.levels[key]
+}
+
+function getBulletRadius(world: WorldState) {
+  return 4 * (1 + getUpgradeLevel(world, 'bigBullets') * 0.3)
+}
+
+function getPlayerDamage(world: WorldState) {
+  const damageLevel = getUpgradeLevel(world, 'damageUp')
+  const bigBulletLevel = getUpgradeLevel(world, 'bigBullets')
+  return BASE_PLAYER_BULLET_DAMAGE * (1 + damageLevel * 0.2) * (1 + bigBulletLevel * 0.15)
+}
+
+function getPlayerCooldown(world: WorldState) {
+  const level = getUpgradeLevel(world, 'fireRateUp')
+  return Math.max(MIN_FIRE_COOLDOWN, BASE_FIRE_COOLDOWN * 0.85 ** level)
+}
+
+function getPlayerBulletCount(world: WorldState) {
+  return 1 + getUpgradeLevel(world, 'multishot') * 2
+}
+
+function getCriticalMultiplier(world: WorldState) {
+  const level = getUpgradeLevel(world, 'criticalHit')
+  const chance = Math.min(0.15 * level, 0.9)
+  return Math.random() < chance ? 2 : 1
 }
 
 function applyUpgrade(world: WorldState, upgrade: UpgradeKey) {
-  world.upgrades.picks.push(upgrade)
+  world.upgrades.levels[upgrade] += 1
 
-  switch (upgrade) {
-    case 'scatter':
-      world.upgrades.scatter = true
-      break
-    case 'pierce':
-      world.upgrades.pierce = true
-      break
-    case 'shield':
-      world.upgrades.shieldCharges += 1
-      break
-    case 'speed':
-      world.upgrades.speedMultiplier *= 1.2
-      break
-    case 'damage':
-      world.upgrades.damageMultiplier *= 1.5
-      break
-    case 'fireRate':
-      world.upgrades.fireRateMultiplier *= 1.3
-      break
+  if (upgrade === 'armorUp') {
+    world.player.maxHp += 30
+    world.player.hp = Math.min(world.player.maxHp, world.player.hp + 30)
   }
+}
+
+function getUpgradeOptions(world: WorldState): UpgradeOptionView[] {
+  return world.upgradeOptions.map((key) => ({
+    key,
+    title: UPGRADE_LIBRARY[key].title,
+    description: UPGRADE_LIBRARY[key].description,
+    level: world.upgrades.levels[key],
+  }))
 }
 
 function spawnWave(world: WorldState) {
@@ -147,60 +163,74 @@ function spawnWave(world: WorldState) {
   world.bullets = []
   world.flashes = []
   world.particles = []
-  world.player.x = PLAYER_SPAWN.x
-  world.player.y = PLAYER_SPAWN.y
-  world.player.invulnerable = 1
+  world.upgradeOptions = []
   world.player.cooldown = 0
+  world.player.invulnerable = 1
   world.pointer.inside = false
   world.shake = 0
 
-  const enemyCount = 3 + (world.wave - 1) * 2
-  const slots = shuffle(world.map.spawnCells).slice(0, enemyCount)
+  const safeSpawn = findSafeSpawnPosition(world.map, PLAYER_SPAWN, world.player.radius)
+  world.player.x = safeSpawn.x
+  world.player.y = safeSpawn.y
+
+  const enemyCount = 4 + (world.wave - 1) * 2 + DIFFICULTY_PRESETS[world.difficulty].enemyExtraCount
+  const slots = shuffle(world.map.spawnCells)
+    .filter((spawn) => Math.hypot(spawn.x - safeSpawn.x, spawn.y - safeSpawn.y) > 180)
+    .slice(0, enemyCount)
+
   world.enemies = slots.map((spawn) => createEnemy(world, spawn))
 }
 
 function createEnemy(world: WorldState, spawn: Vec2): EnemyTank {
-  const hp = 2 + Math.floor((world.wave - 1) / 2)
+  const hp = BASE_ENEMY_HP + (world.wave - 1) * 11
+  const safeSpawn = findSafeSpawnPosition(world.map, spawn, ENEMY_RADIUS)
+
   return {
     id: world.nextEnemyId++,
-    x: spawn.x,
-    y: spawn.y,
+    x: safeSpawn.x,
+    y: safeSpawn.y,
     angle: Math.PI,
-    radius: 15,
+    radius: ENEMY_RADIUS,
     hp,
     maxHp: hp,
-    cooldown: 0.9 + Math.random() * 0.5,
+    damage: DIFFICULTY_PRESETS[world.difficulty].enemyDamage,
+    cooldown: 0.85 + Math.random() * 0.45,
     path: [],
-    repathIn: Math.random() * 0.2,
-    fireJitter: 0.2 + Math.random() * 0.55,
+    repathIn: Math.random() * 0.25,
+    fireJitter: 0.22 + Math.random() * 0.55,
   }
 }
 
 function spawnFlash(world: WorldState, x: number, y: number, radius: number, color: string) {
   world.flashes.push({
+    id: world.nextEffectId++,
     x,
     y,
     radius,
     color,
-    life: 0.14,
-    maxLife: 0.14,
+    life: 0.16,
+    maxLife: 0.16,
   })
 }
 
 function spawnExplosion(world: WorldState, x: number, y: number, color: string, size = 24) {
-  const count = 20 + Math.floor(Math.random() * 11)
+  const count = 18 + Math.floor(Math.random() * 12)
+
   for (let index = 0; index < count; index += 1) {
-    const angle = (Math.PI * 2 * index) / count + Math.random() * 0.6
-    const speed = 50 + Math.random() * 180
+    const angle = (Math.PI * 2 * index) / count + Math.random() * 0.45
+    const speed = 75 + Math.random() * 170
+    const life = 0.35 + Math.random() * 0.35
+
     world.particles.push({
+      id: world.nextEffectId++,
       x,
       y,
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed,
-      life: 0.35 + Math.random() * 0.35,
-      maxLife: 0.35 + Math.random() * 0.35,
-      size: 2 + Math.random() * 4,
-      color: Math.random() < 0.6 ? color : '#f8fafc',
+      life,
+      maxLife: life,
+      size: 3 + Math.random() * 5,
+      color: Math.random() < 0.65 ? color : '#f8fafc',
     })
   }
 
@@ -224,10 +254,9 @@ function movePlayer(world: WorldState, delta: number) {
 
   if (move.x !== 0 || move.y !== 0) {
     const length = Math.hypot(move.x, move.y)
-    const speed = BASE_PLAYER_SPEED * world.upgrades.speedMultiplier
     const offset = {
-      x: (move.x / length) * speed * delta,
-      y: (move.y / length) * speed * delta,
+      x: (move.x / length) * BASE_PLAYER_SPEED * delta,
+      y: (move.y / length) * BASE_PLAYER_SPEED * delta,
     }
     const next = moveWithCollision(world.player, offset, world.player.radius, world.map)
     world.player.x = next.x
@@ -238,7 +267,7 @@ function movePlayer(world: WorldState, delta: number) {
     ? { x: world.pointer.x, y: world.pointer.y }
     : world.enemies[0]
       ? nearestEnemyPosition(world)
-      : { x: world.player.x, y: world.player.y - 30 }
+      : { x: world.player.x, y: world.player.y - 40 }
 
   world.player.angle = Math.atan2(target.y - world.player.y, target.x - world.player.x)
 }
@@ -263,33 +292,45 @@ function shootPlayer(world: WorldState, audio: TankGameAudio) {
     return
   }
 
-  const angles = world.upgrades.scatter ? [-0.22, 0, 0.22] : [0]
-  angles.forEach((offset) => {
+  const bulletCount = getPlayerBulletCount(world)
+  const spread = bulletCount > 1 ? Math.min(0.18, 0.09 + bulletCount * 0.014) : 0
+  const middle = (bulletCount - 1) / 2
+  const baseDamage = getPlayerDamage(world)
+  const bulletRadius = getBulletRadius(world)
+  const pierceLevel = getUpgradeLevel(world, 'piercingBullets')
+
+  for (let index = 0; index < bulletCount; index += 1) {
+    const offset = (index - middle) * spread
     const angle = world.player.angle + offset
-    const speed = BASE_BULLET_SPEED
-    const muzzleDistance = 24
+    const critMultiplier = getCriticalMultiplier(world)
+    const damage = baseDamage * critMultiplier
+    const muzzleDistance = 28
+
     world.bullets.push({
       id: world.nextBulletId++,
       x: world.player.x + Math.cos(angle) * muzzleDistance,
       y: world.player.y + Math.sin(angle) * muzzleDistance,
-      vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed,
-      radius: 4,
-      damage: world.upgrades.damageMultiplier,
+      vx: Math.cos(angle) * BASE_BULLET_SPEED,
+      vy: Math.sin(angle) * BASE_BULLET_SPEED,
+      radius: bulletRadius,
+      damage,
       fromEnemy: false,
-      ttl: 1.6,
-      pierce: world.upgrades.pierce,
+      ttl: BULLET_TTL,
+      pierceRemaining: pierceLevel,
       hitIds: [],
+      crit: critMultiplier > 1,
     })
-  })
+  }
 
-  world.player.cooldown = BASE_FIRE_COOLDOWN / world.upgrades.fireRateMultiplier
+  world.player.cooldown = getPlayerCooldown(world)
   world.shake = Math.max(world.shake, 4)
   spawnFlash(world, world.player.x + Math.cos(world.player.angle) * 24, world.player.y + Math.sin(world.player.angle) * 24, 18, '#22d3ee')
   audio.shoot()
 }
 
 function updateEnemies(world: WorldState, delta: number, audio: TankGameAudio) {
+  const speedMultiplier = DIFFICULTY_PRESETS[world.difficulty].enemySpeedMultiplier
+
   world.enemies.forEach((enemy) => {
     enemy.cooldown -= delta
     enemy.repathIn -= delta
@@ -313,7 +354,7 @@ function updateEnemies(world: WorldState, delta: number, audio: TankGameAudio) {
     const desiredAngle = Math.atan2(target.y - enemy.y, target.x - enemy.x)
     enemy.angle = lerpAngle(enemy.angle, desiredAngle, delta * 6)
 
-    const speed = (96 + world.wave * 7) * Math.min(1.4, 1 + world.wave * 0.03)
+    const speed = (BASE_ENEMY_SPEED + world.wave * 8) * speedMultiplier
     const offset = {
       x: Math.cos(desiredAngle) * speed * delta,
       y: Math.sin(desiredAngle) * speed * delta,
@@ -329,23 +370,24 @@ function updateEnemies(world: WorldState, delta: number, audio: TankGameAudio) {
         id: world.nextBulletId++,
         x: enemy.x + Math.cos(angle) * 22,
         y: enemy.y + Math.sin(angle) * 22,
-        vx: Math.cos(angle) * 280,
-        vy: Math.sin(angle) * 280,
-        radius: 4,
-        damage: 1,
+        vx: Math.cos(angle) * 290,
+        vy: Math.sin(angle) * 290,
+        radius: 5,
+        damage: enemy.damage,
         fromEnemy: true,
-        ttl: 1.7,
-        pierce: false,
+        ttl: 1.85,
+        pierceRemaining: 0,
         hitIds: [],
+        crit: false,
       })
-      enemy.cooldown = 1.1 + enemy.fireJitter
+      enemy.cooldown = 1.05 + enemy.fireJitter
       spawnFlash(world, enemy.x + Math.cos(angle) * 20, enemy.y + Math.sin(angle) * 20, 16, '#fb7185')
       audio.shoot()
     }
   })
 }
 
-function updateBullets(world: WorldState, delta: number, audio: TankGameAudio) {
+function updateBullets(world: WorldState, delta: number, audio: TankGameAudio, godMode: boolean) {
   const survivors: Bullet[] = []
   const destroyedEnemyIds = new Set<number>()
 
@@ -362,14 +404,14 @@ function updateBullets(world: WorldState, delta: number, audio: TankGameAudio) {
       clamp(Math.floor(bullet.x / 40), 0, world.map.walls[0].length - 1)
     ]
     if (hitWall) {
-      spawnFlash(world, bullet.x, bullet.y, bullet.fromEnemy ? 14 : 18, bullet.fromEnemy ? '#fb7185' : '#22d3ee')
+      spawnFlash(world, bullet.x, bullet.y, bullet.fromEnemy ? 16 : 20, bullet.fromEnemy ? '#fb7185' : '#22d3ee')
       return
     }
 
     if (bullet.fromEnemy) {
       const hitPlayer = Math.hypot(bullet.x - world.player.x, bullet.y - world.player.y) < bullet.radius + world.player.radius
       if (hitPlayer && world.player.invulnerable <= 0) {
-        handlePlayerDamage(world, bullet.damage, audio)
+        handlePlayerDamage(world, bullet.damage, audio, godMode)
         return
       }
 
@@ -390,18 +432,21 @@ function updateBullets(world: WorldState, delta: number, audio: TankGameAudio) {
 
       enemy.hp -= bullet.damage
       bullet.hitIds.push(enemy.id)
-      spawnFlash(world, bullet.x, bullet.y, 18, '#fb923c')
+      spawnFlash(world, bullet.x, bullet.y, bullet.crit ? 22 : 18, bullet.crit ? '#f59e0b' : '#fb923c')
       world.score += 25
 
       if (enemy.hp <= 0) {
         destroyedEnemyIds.add(enemy.id)
         world.score += 100
         world.shake = Math.max(world.shake, 8)
-        spawnExplosion(world, enemy.x, enemy.y, '#fb7185', 30)
+        spawnExplosion(world, enemy.x, enemy.y, '#f43f5e', 34)
         audio.explosion()
+        tryApplyVampirism(world)
       }
 
-      if (!bullet.pierce) {
+      if (bullet.pierceRemaining > 0) {
+        bullet.pierceRemaining -= 1
+      } else {
         bulletRemoved = true
       }
     })
@@ -417,18 +462,33 @@ function updateBullets(world: WorldState, delta: number, audio: TankGameAudio) {
   }
 }
 
-function handlePlayerDamage(world: WorldState, damage: number, audio: TankGameAudio) {
-  if (world.upgrades.shieldCharges > 0) {
-    world.upgrades.shieldCharges -= 1
-    spawnFlash(world, world.player.x, world.player.y, 26, '#22d3ee')
-    world.player.invulnerable = 0.5
+function tryApplyVampirism(world: WorldState) {
+  const level = getUpgradeLevel(world, 'vampirism')
+  if (level <= 0) {
+    return
+  }
+
+  const chance = Math.min(0.2 * level, 0.9)
+  if (Math.random() > chance) {
+    return
+  }
+
+  const heal = 5 * level
+  world.player.hp = Math.min(world.player.maxHp, world.player.hp + heal)
+  spawnFlash(world, world.player.x, world.player.y, 24, '#34d399')
+}
+
+function handlePlayerDamage(world: WorldState, damage: number, audio: TankGameAudio, godMode: boolean) {
+  if (godMode) {
+    world.player.invulnerable = 0.12
+    spawnFlash(world, world.player.x, world.player.y, 28, '#22d3ee')
     return
   }
 
   world.player.hp = Math.max(0, world.player.hp - damage)
-  world.player.invulnerable = 1
+  world.player.invulnerable = PLAYER_INVULNERABLE_WINDOW
   world.shake = Math.max(world.shake, 10)
-  spawnExplosion(world, world.player.x, world.player.y, '#fb923c', 28)
+  spawnExplosion(world, world.player.x, world.player.y, '#fb923c', 30)
   audio.explosion()
 
   if (world.player.hp <= 0) {
@@ -457,7 +517,7 @@ function updateEffects(world: WorldState, delta: number) {
   })
 }
 
-function updateWorld(world: WorldState, delta: number, audio: TankGameAudio) {
+function updateWorld(world: WorldState, delta: number, audio: TankGameAudio, godMode: boolean) {
   world.time += delta
   updateEffects(world, delta)
 
@@ -470,11 +530,11 @@ function updateWorld(world: WorldState, delta: number, audio: TankGameAudio) {
     shootPlayer(world, audio)
   }
   updateEnemies(world, delta, audio)
-  updateBullets(world, delta, audio)
+  updateBullets(world, delta, audio, godMode)
 
   if (world.scene === 'playing' && world.enemies.length === 0) {
     world.scene = 'upgrading'
-    world.upgradeOptions = pickUpgradeOptions(world.upgrades)
+    world.upgradeOptions = pickUpgradeOptions()
     world.input.firing = false
   }
 }
@@ -484,52 +544,71 @@ function lerpAngle(from: number, to: number, amount: number) {
   return from + delta * Math.min(1, amount)
 }
 
-function translatePointer(canvas: HTMLCanvasElement, clientX: number, clientY: number) {
-  const rect = canvas.getBoundingClientRect()
-  const scaleX = GAME_WIDTH / rect.width
-  const scaleY = GAME_HEIGHT / rect.height
+function cloneWorld(world: WorldState): WorldState {
   return {
-    x: (clientX - rect.left) * scaleX,
-    y: (clientY - rect.top) * scaleY,
+    ...world,
+    player: { ...world.player },
+    enemies: world.enemies.map((enemy) => ({ ...enemy, path: [...enemy.path] })),
+    bullets: world.bullets.map((bullet) => ({ ...bullet, hitIds: [...bullet.hitIds] })),
+    particles: world.particles.map((particle) => ({ ...particle })),
+    flashes: world.flashes.map((flash) => ({ ...flash })),
+    input: { ...world.input },
+    pointer: { ...world.pointer },
+    upgrades: {
+      levels: { ...world.upgrades.levels },
+    },
+    upgradeOptions: [...world.upgradeOptions],
   }
 }
 
-export function useTankGame() {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const audioRef = useRef(new TankGameAudio())
-  const worldRef = useRef(createWorld(Date.now()))
-  const [view, setView] = useState(() => createView(worldRef.current))
+type UseTankGameOptions = {
+  godMode: boolean
+}
 
-  const syncView = useCallback(() => {
-    setView(createView(worldRef.current))
-  }, [])
+export function useTankGame({ godMode }: UseTankGameOptions) {
+  const audioRef = useRef(new TankGameAudio())
+  const [world, setWorld] = useState(() => createWorld(1, 'normal'))
+  const worldRef = useRef(world)
+  const godModeRef = useRef(godMode)
+
+  useEffect(() => {
+    godModeRef.current = godMode
+  }, [godMode])
 
   const ensureAudio = useCallback(async () => {
     await audioRef.current.resume()
   }, [])
 
-  const startGame = useCallback(async () => {
-    await ensureAudio()
-    worldRef.current = createWorld(Date.now())
-    spawnWave(worldRef.current)
-    syncView()
-  }, [ensureAudio, syncView])
+  const syncWorld = useCallback(() => {
+    setWorld(cloneWorld(worldRef.current))
+  }, [])
+
+  const startGame = useCallback(
+    async (difficulty: DifficultyKey) => {
+      await ensureAudio()
+      const nextWorld = createWorld(Date.now(), difficulty)
+      spawnWave(nextWorld)
+      worldRef.current = nextWorld
+      syncWorld()
+    },
+    [ensureAudio, syncWorld],
+  )
 
   const selectUpgrade = useCallback(
     async (upgrade: UpgradeKey) => {
       await ensureAudio()
-      const world = worldRef.current
-      if (world.scene !== 'upgrading') {
+      const activeWorld = worldRef.current
+      if (activeWorld.scene !== 'upgrading') {
         return
       }
 
-      applyUpgrade(world, upgrade)
+      applyUpgrade(activeWorld, upgrade)
       audioRef.current.upgrade()
-      world.wave += 1
-      spawnWave(world)
-      syncView()
+      activeWorld.wave += 1
+      spawnWave(activeWorld)
+      syncWorld()
     },
-    [ensureAudio, syncView],
+    [ensureAudio, syncWorld],
   )
 
   useEffect(() => {
@@ -578,29 +657,14 @@ export function useTankGame() {
   }, [])
 
   useEffect(() => {
-    const canvas = canvasRef.current
-    const context = canvas?.getContext('2d')
-    if (!canvas || !context) {
-      return
-    }
-
     let frameId = 0
     let lastTime = performance.now()
-    let snapshotClock = 0
 
     const tick = (now: number) => {
       const delta = Math.min(0.033, (now - lastTime) / 1000)
       lastTime = now
-      snapshotClock += delta
-
-      updateWorld(worldRef.current, delta, audioRef.current)
-      renderTankGame(context, worldRef.current)
-
-      if (snapshotClock >= SNAPSHOT_INTERVAL) {
-        snapshotClock = 0
-        setView(createView(worldRef.current))
-      }
-
+      updateWorld(worldRef.current, delta, audioRef.current, godModeRef.current)
+      setWorld(cloneWorld(worldRef.current))
       frameId = window.requestAnimationFrame(tick)
     }
 
@@ -609,18 +673,13 @@ export function useTankGame() {
   }, [])
 
   useEffect(() => {
+    const audio = audioRef.current
     return () => {
-      audioRef.current.dispose()
+      audio.dispose()
     }
   }, [])
 
-  const handlePointerMove = useCallback((event: ReactPointerEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current
-    if (!canvas) {
-      return
-    }
-
-    const point = translatePointer(canvas, event.clientX, event.clientY)
+  const handleAim = useCallback((point: Vec2) => {
     worldRef.current.pointer = {
       x: point.x,
       y: point.y,
@@ -645,11 +704,11 @@ export function useTankGame() {
   }, [])
 
   return {
-    canvasRef,
-    view,
+    world,
+    upgradeOptions: getUpgradeOptions(world),
     startGame,
     selectUpgrade,
-    handlePointerMove,
+    handleAim,
     handlePointerLeave,
     handlePointerDown,
     handlePointerUp,
