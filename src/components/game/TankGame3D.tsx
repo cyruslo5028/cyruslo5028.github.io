@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion'
 import { Shield, Sparkles, Zap } from 'lucide-react'
-import React, { type ReactNode, useState } from 'react'
+import React, { type ReactNode, useState, useEffect, useRef } from 'react'
 import { TankGame3DScene } from './TankGame3DScene'
-import { DIFFICULTY_PRESETS, UPGRADE_LIBRARY, type DifficultyKey } from './tankGameModel'
+import { DIFFICULTY_PRESETS, UPGRADE_LIBRARY, type DifficultyKey, GAME_WIDTH, GAME_HEIGHT, GRID_ROWS, GRID_COLS, type WorldState } from './tankGameModel'
 import { useTankGame } from './useTankGame'
 
 void React
@@ -77,8 +77,14 @@ export function TankGame3D({ godMode }: TankGame3DProps) {
         </div>
       </div>
 
+      {world.scene === 'playing' ? (
+        <div className="pointer-events-none absolute bottom-4 left-4 z-20">
+          <MiniMap world={world} />
+        </div>
+      ) : null}
+
       {ownedUpgrades.length > 0 ? (
-        <div className="pointer-events-none absolute bottom-4 left-4 right-4 z-20 hidden flex-wrap gap-2 md:flex">
+        <div className="pointer-events-none absolute bottom-4 left-44 right-4 z-20 hidden flex-wrap gap-2 md:flex">
           {ownedUpgrades.map(([key, level]) => (
             <span key={key} className="rounded-full border border-white/10 bg-black/45 px-3 py-1 text-[11px] text-text-primary backdrop-blur">
               <span className="text-neon">{UPGRADE_LIBRARY[key].title}</span> · Lv.{level}
@@ -272,6 +278,62 @@ function UpgradeOverlay({
           ))}
         </div>
       </div>
+    </div>
+  )
+}
+
+function MiniMap({ world }: { world: WorldState }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    const width = 140
+    const height = (GAME_HEIGHT / GAME_WIDTH) * width
+    canvas.width = width
+    canvas.height = height
+
+    const scaleX = width / GAME_WIDTH
+    const scaleY = height / GAME_HEIGHT
+
+    ctx.clearRect(0, 0, width, height)
+
+    // Draw walls
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.15)'
+    const cellW = width / GRID_COLS
+    const cellH = height / GRID_ROWS
+
+    if (world.map && world.map.walls) {
+      for (let row = 0; row < GRID_ROWS; row++) {
+        for (let col = 0; col < GRID_COLS; col++) {
+          if (world.map.walls[row][col]) {
+            ctx.fillRect(col * cellW, row * cellH, cellW, cellH)
+          }
+        }
+      }
+    }
+
+    // Draw player
+    ctx.fillStyle = '#22d3ee'
+    ctx.beginPath()
+    ctx.arc(world.player.x * scaleX, world.player.y * scaleY, 3, 0, Math.PI * 2)
+    ctx.fill()
+
+    // Draw enemies
+    ctx.fillStyle = '#f43f5e'
+    for (const enemy of world.enemies) {
+      ctx.beginPath()
+      ctx.arc(enemy.x * scaleX, enemy.y * scaleY, 2.5, 0, Math.PI * 2)
+      ctx.fill()
+    }
+  }, [world])
+
+  return (
+    <div className="rounded-xl border border-white/10 bg-black/40 p-1.5 backdrop-blur">
+      <canvas ref={canvasRef} className="opacity-90" />
     </div>
   )
 }

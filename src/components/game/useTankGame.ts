@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { TankGameAudio } from './tankGameAudio'
-import { clamp, createGameMap, findPath, findSafeSpawnPosition, hasLineOfSight, moveWithCollision } from './tankGameMap'
+import { clamp, collidesWithWalls, createGameMap, findPath, findSafeSpawnPosition, hasLineOfSight, moveWithCollision } from './tankGameMap'
 import {
   BASE_BULLET_SPEED,
   BASE_ENEMY_HP,
@@ -519,7 +519,9 @@ function updateEffects(world: WorldState, delta: number) {
 
 function resolveEntityCollisions(world: WorldState) {
   const player = world.player
+  const map = world.map
 
+  // Enemy vs enemy
   for (let i = 0; i < world.enemies.length; i++) {
     for (let j = i + 1; j < world.enemies.length; j++) {
       const e1 = world.enemies[i]
@@ -528,19 +530,31 @@ function resolveEntityCollisions(world: WorldState) {
       const dy = e2.y - e1.y
       const dist = Math.hypot(dx, dy)
       const minDist = e1.radius + e2.radius
-      
+
       if (dist < minDist && dist > 0.001) {
         const overlap = minDist - dist
         const pushX = (dx / dist) * (overlap / 2)
         const pushY = (dy / dist) * (overlap / 2)
-        e1.x -= pushX
-        e1.y -= pushY
-        e2.x += pushX
-        e2.y += pushY
+
+        const e1x = e1.x - pushX
+        const e1y = e1.y - pushY
+        const e2x = e2.x + pushX
+        const e2y = e2.y + pushY
+
+        // Only apply push if it doesn't move into a wall
+        if (!collidesWithWalls(e1x, e1y, e1.radius, map)) {
+          e1.x = e1x
+          e1.y = e1y
+        }
+        if (!collidesWithWalls(e2x, e2y, e2.radius, map)) {
+          e2.x = e2x
+          e2.y = e2y
+        }
       }
     }
   }
 
+  // Enemy vs player
   for (let i = 0; i < world.enemies.length; i++) {
     const e = world.enemies[i]
     const dx = e.x - player.x
@@ -552,10 +566,20 @@ function resolveEntityCollisions(world: WorldState) {
       const overlap = minDist - dist
       const pushX = (dx / dist) * (overlap / 2)
       const pushY = (dy / dist) * (overlap / 2)
-      player.x -= pushX
-      player.y -= pushY
-      e.x += pushX
-      e.y += pushY
+
+      const px = player.x - pushX
+      const py = player.y - pushY
+      const ex = e.x + pushX
+      const ey = e.y + pushY
+
+      if (!collidesWithWalls(px, py, player.radius, map)) {
+        player.x = px
+        player.y = py
+      }
+      if (!collidesWithWalls(ex, ey, e.radius, map)) {
+        e.x = ex
+        e.y = ey
+      }
     }
   }
 }
