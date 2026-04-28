@@ -1,13 +1,16 @@
+import React from 'react'
 import { motion } from 'framer-motion'
+import { Link } from 'react-router-dom'
 import { MapPin } from 'lucide-react'
 import { useTypewriter } from '../hooks/useTypewriter'
-import profileImg from '../assets/profilepic.jpg'
+import profileImg from '../assets/IMG_3536.jpg'
 import { portfolioContent } from '../content/portfolio'
 import { ProjectGrid } from '../components/sections/ProjectGrid'
 import { SkillsCloud } from '../components/sections/SkillsCloud'
 import { TimelinePreview } from '../components/sections/TimelinePreview'
 
 export function HomePage() {
+  void React
   const heroText = "Hi, I'm Cyrus Lo"
   const { value, done } = useTypewriter(heroText, { speedMs: 38, startDelayMs: 170 })
 
@@ -125,14 +128,14 @@ export function HomePage() {
       <section className="glass-neon rounded-3xl p-7 md:p-10">
         <h2 className="text-xl font-semibold text-text-primary">Quick Links</h2>
         <p className="mt-2 text-sm text-text-secondary">
-          Legacy demos and side projects are preserved under <span className="text-text-primary">/waroftank</span>,
+          Interactive demos live inside the portfolio, including <span className="text-text-primary">/waroftank</span>,
           <span className="text-text-primary"> /VenmoSplit</span>, and
           <span className="text-text-primary"> /webGLshading</span>.
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
-          <a className="btn-primary" href="/waroftank/index.html" target="_blank" rel="noreferrer">
+          <Link className="btn-primary" to="/waroftank">
             War of Tank
-          </a>
+          </Link>
           <a className="btn-primary" href="/webGLshading/index.html" target="_blank" rel="noreferrer">
             WebGL Shading Demo
           </a>

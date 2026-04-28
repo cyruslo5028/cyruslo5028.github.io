@@ -14,10 +14,10 @@ export const portfolioContent: PortfolioContent = {
   projects: [
     {
       title: 'War of Tank',
-      description: 'A small Unity / C# arcade shooter (WebGL build).',
-      tags: ['C#', 'Unity'],
-      href: '/waroftank/index.html',
-      note: 'Legacy WebGL build (kept as-is).',
+      description: 'A neon roguelike tank shooter rebuilt with React, TypeScript, and Canvas2D.',
+      tags: ['React', 'TypeScript', 'Canvas2D'],
+      href: '/waroftank',
+      note: 'Hong Kong Kowloon-inspired arcade experience embedded in the portfolio.',
     },
     {
       title: 'WebGL Real-time Shading Demo',

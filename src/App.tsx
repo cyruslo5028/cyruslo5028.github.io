@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import React from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import { AnimatedBackground } from './components/background/AnimatedBackground'
@@ -10,6 +10,7 @@ import { HomePage } from './pages/HomePage'
 import { AboutPage } from './pages/AboutPage'
 import { ProjectsPage } from './pages/ProjectsPage'
 import { ContactPage } from './pages/ContactPage'
+import { WarOfTankPage } from './pages/WarOfTankPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 
 const pageVariants = {
@@ -21,7 +22,7 @@ const pageVariants = {
 export default function App() {
   const location = useLocation()
 
-  const key = useMemo(() => location.pathname, [location.pathname])
+  const key = React.useMemo(() => location.pathname, [location.pathname])
 
   return (
     <div className="min-h-screen">
@@ -45,6 +46,7 @@ export default function App() {
             <Route path="/about" element={<AboutPage />} />
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/waroftank" element={<WarOfTankPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </motion.main>
