@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { MapPin } from 'lucide-react'
 import { useTypewriter } from '../hooks/useTypewriter'
-import profileImg from '../assets/IMG_3536.jpg'
+import profileImg from '../assets/profilepic.jpg'
 import { portfolioContent } from '../content/portfolio'
 import { ProjectGrid } from '../components/sections/ProjectGrid'
 import { SkillsCloud } from '../components/sections/SkillsCloud'
