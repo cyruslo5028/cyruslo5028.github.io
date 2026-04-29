@@ -11,6 +11,7 @@ import { AboutPage } from './pages/AboutPage'
 import { ProjectsPage } from './pages/ProjectsPage'
 import { ContactPage } from './pages/ContactPage'
 import { WarOfTankPage } from './pages/WarOfTankPage'
+import { HKRogueLikePage } from './pages/HKRogueLikePage'
 import { NotFoundPage } from './pages/NotFoundPage'
 
 const pageVariants = {
@@ -47,6 +48,7 @@ export default function App() {
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/waroftank" element={<WarOfTankPage />} />
+            <Route path="/hkroguelike" element={<HKRogueLikePage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </motion.main>
