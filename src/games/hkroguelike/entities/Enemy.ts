@@ -1,4 +1,4 @@
-import type { Enemy } from '../types'
+import type { Enemy, Projectile } from '../types'
 import type { World } from '../core/World'
 import { ENEMIES } from '../content/enemies'
 import { damagePlayer } from './Player'
