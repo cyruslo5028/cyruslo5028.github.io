@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { HKRoguelikeGame } from '../games/hkroguelike'
 
 export function HKRogueLikePage() {
   void React
@@ -13,22 +14,19 @@ export function HKRogueLikePage() {
           </Link>
 
           <div className="flex flex-col gap-2">
-            <p className="text-sm uppercase tracking-[0.24em] text-text-secondary">香港古惑仔 2D Roguelike</p>
+            <p className="text-sm uppercase tracking-[0.24em] text-text-secondary">香港古惑仔 Archero-style Roguelite</p>
             <h1 className="text-3xl font-semibold text-text-primary md:text-5xl">
               霓虹江湖 <span className="text-neon">NEON JIANGHU</span>
             </h1>
+            <p className="text-xs text-text-secondary md:text-sm">
+              WASD / 方向鍵移動 · 停低自動擲飛刀 · 清房揀牌 · 死亡保留江湖地位
+            </p>
           </div>
         </div>
       </section>
 
       <section className="glass-neon overflow-hidden rounded-3xl p-3 md:p-4">
-        <iframe
-          title="霓虹江湖 NEON JIANGHU"
-          src="/hk_roguelike.html"
-          width="100%"
-          height="700px"
-          style={{ border: 'none', borderRadius: '12px' }}
-        />
+        <HKRoguelikeGame />
       </section>
     </div>
   )
