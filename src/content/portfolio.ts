@@ -14,10 +14,10 @@ export const portfolioContent: PortfolioContent = {
   projects: [
     {
       title: '霓虹江湖',
-      description: 'A Hong Kong Young & Dangerous-inspired 2D Roguelike card game, built entirely in a single HTML file with Canvas2D.',
-      tags: ['Canvas2D', 'Roguelike', 'Game', 'Vanilla JS'],
+      description: 'Archero-style Hong Kong gangster roguelite. 4 districts × 15 rooms, 10 unlockable characters, AI-painted manhua maps, element reactions (冰+火=爆), per-floor scaling and a victory screen.',
+      tags: ['React', 'TypeScript', 'Canvas2D', 'Roguelite', 'Game'],
       href: '/hkroguelike',
-      note: 'Character builds, wave combat, and card upgrade system—all in vanilla JS.',
+      note: 'Built from scratch with React + Canvas2D — fixed-timestep loop, procedural SFX/BGM, sprite + map asset pipeline.',
     },
     {
       title: 'War of Tank',

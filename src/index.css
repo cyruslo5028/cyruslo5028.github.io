@@ -20,8 +20,8 @@ body {
 
 body {
   margin: 0;
-  background: #0a0a0a;
-  color: #f0f0f0;
+  background: #0a0d12;
+  color: #f5f1e3;
   font-family:
     ui-sans-serif,
     system-ui,
@@ -43,7 +43,7 @@ body {
 
 /* Subtle selection */
 ::selection {
-  background: rgba(34, 211, 238, 0.16);
+  background: rgba(126, 123, 217, 0.22);
 }
 
 /* A tiny helper: hide scrollbar without breaking scroll */

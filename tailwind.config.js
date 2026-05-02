@@ -25,9 +25,37 @@ export default {
           silver: '#aaaaaa',
         },
         neon: {
+          // legacy (kept for backward compat)
           cyan: '#22d3ee',
           blue: '#60a5fa',
           purple: '#a78bfa',
+        },
+        // Pantone-inspired palette (2024 refresh)
+        peri: {
+          DEFAULT: '#7e7bd9',  // 17-3938 Very Peri
+          50: '#f1f0fb',
+          100: '#dad8f3',
+          200: '#b3b1e6',
+          300: '#8d8bda',
+          400: '#7e7bd9',
+          500: '#6663b8',
+          600: '#534f96',
+          700: '#403d72',
+          800: '#2c2a4e',
+          900: '#191728',
+        },
+        mango: {
+          DEFAULT: '#d69c2f',  // 13-0859 Mango Mojito
+          400: '#e6b554',
+          500: '#d69c2f',
+          600: '#a87822',
+        },
+        ink: {
+          0: '#000000',
+          50: '#0a0d12',  // new bg base (Black 6 inspired)
+          100: '#0f1218',
+          150: '#161922',
+          200: '#1f2230',
         },
       },
       boxShadow: {

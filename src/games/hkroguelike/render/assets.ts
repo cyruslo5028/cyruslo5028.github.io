@@ -29,7 +29,7 @@ function load(url: string): ImageAsset {
 
 // === Floor textures ===
 export function getFloorPattern(ctx: CanvasRenderingContext2D, floor: FloorKey): CanvasPattern | null {
-  const url = `/maps/floors/${floor}.png`
+  const url = `/maps/floors/${floor}.webp`
   const asset = load(url)
   if (asset.state !== 'ready') return null
   if (asset.pattern) return asset.pattern
@@ -39,11 +39,11 @@ export function getFloorPattern(ctx: CanvasRenderingContext2D, floor: FloorKey):
 }
 
 export function getFloorImageReady(floor: FloorKey): boolean {
-  return load(`/maps/floors/${floor}.png`).state === 'ready'
+  return load(`/maps/floors/${floor}.webp`).state === 'ready'
 }
 
 export function preloadAllFloors(): void {
-  for (const k of FLOOR_ORDER) load(`/maps/floors/${k}.png`)
+  for (const k of FLOOR_ORDER) load(`/maps/floors/${k}.webp`)
 }
 
 // === Wall sprites ===
@@ -53,22 +53,22 @@ type WallKey = typeof WALL_KEYS[number]
 export function getWallSprite(seed: number): HTMLImageElement | null {
   const idx = ((seed * 2654435761) >>> 0) % WALL_KEYS.length
   const k: WallKey = WALL_KEYS[idx]
-  const asset = load(`/maps/walls/${k}.png`)
+  const asset = load(`/maps/walls/${k}.webp`)
   return asset.state === 'ready' ? asset.img : null
 }
 
 export function preloadAllWalls(): void {
-  for (const k of WALL_KEYS) load(`/maps/walls/${k}.png`)
+  for (const k of WALL_KEYS) load(`/maps/walls/${k}.webp`)
 }
 
 // === Boss arena backdrops ===
 export function getBossBackdrop(floor: FloorKey): HTMLImageElement | null {
-  const asset = load(`/maps/bosses/${floor}_boss.png`)
+  const asset = load(`/maps/bosses/${floor}_boss.webp`)
   return asset.state === 'ready' ? asset.img : null
 }
 
 export function preloadAllBosses(): void {
-  for (const k of FLOOR_ORDER) load(`/maps/bosses/${k}_boss.png`)
+  for (const k of FLOOR_ORDER) load(`/maps/bosses/${k}_boss.webp`)
 }
 
 // === Character / enemy / boss sprites (front-facing chibi, matches portraits) ===
@@ -94,24 +94,24 @@ function portraitSlug(key: CharacterKey): string {
 }
 
 export function getPlayerSprite(characterKey: CharacterKey): HTMLImageElement | null {
-  const a = load(`/portraits/${portraitSlug(characterKey)}.png`)
+  const a = load(`/portraits/${portraitSlug(characterKey)}.webp`)
   return a.state === 'ready' ? a.img : null
 }
 
 export function getEnemySprite(kind: string): HTMLImageElement | null {
-  const a = load(`/sprites/enemy_${kind}.png`)
+  const a = load(`/sprites/enemy_${kind}.webp`)
   return a.state === 'ready' ? a.img : null
 }
 
 export function getBossSprite(kind: string): HTMLImageElement | null {
-  const a = load(`/sprites/boss_${kind}.png`)
+  const a = load(`/sprites/boss_${kind}.webp`)
   return a.state === 'ready' ? a.img : null
 }
 
 export function preloadAllSprites(): void {
-  for (const k of PORTRAIT_CHARS) load(`/portraits/${portraitSlug(k)}.png`)
-  for (const k of ENEMY_KEYS) load(`/sprites/enemy_${k}.png`)
-  for (const k of BOSS_KEYS) load(`/sprites/boss_${k}.png`)
+  for (const k of PORTRAIT_CHARS) load(`/portraits/${portraitSlug(k)}.webp`)
+  for (const k of ENEMY_KEYS) load(`/sprites/enemy_${k}.webp`)
+  for (const k of BOSS_KEYS) load(`/sprites/boss_${k}.webp`)
 }
 
 // === Bulk preload — call once on game start ===

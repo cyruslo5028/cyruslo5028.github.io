@@ -10,16 +10,16 @@ void React
 // If a real portrait image exists at /portraits/{key}.png (or .webp/.jpg) it's used
 // instead of the SVG silhouette below. Drop AI-generated art there to upgrade the look.
 const PORTRAIT_URL: Partial<Record<CharacterKey, string>> = {
-  chan_ho_nam: '/portraits/chan_ho_nam.png',
-  shan_gai: '/portraits/shan_gai.png',
-  wu_ngaa_player: '/portraits/wu_ngaa.png',
-  liang_kun: '/portraits/liang_kun.png',
-  tai_tin_yi: '/portraits/tai_tin_yi.png',
-  wong_mou_fu: '/portraits/wong_mou_fu.png',
-  siu_min_fu: '/portraits/siu_min_fu.png',
-  taai_zi: '/portraits/taai_zi.png',
-  daai_lou_b: '/portraits/daai_lou_b.png',
-  fung_wan: '/portraits/fung_wan.png',
+  chan_ho_nam: '/portraits/chan_ho_nam.webp',
+  shan_gai: '/portraits/shan_gai.webp',
+  wu_ngaa_player: '/portraits/wu_ngaa.webp',
+  liang_kun: '/portraits/liang_kun.webp',
+  tai_tin_yi: '/portraits/tai_tin_yi.webp',
+  wong_mou_fu: '/portraits/wong_mou_fu.webp',
+  siu_min_fu: '/portraits/siu_min_fu.webp',
+  taai_zi: '/portraits/taai_zi.webp',
+  daai_lou_b: '/portraits/daai_lou_b.webp',
+  fung_wan: '/portraits/fung_wan.webp',
 }
 
 // Module-level cache: once an image 404s, stop trying to load it on subsequent renders.

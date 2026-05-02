@@ -8,7 +8,7 @@ export function Footer() {
             <div className="text-sm text-text-primary">© {new Date().getFullYear()} Cyrus Lo</div>
             <div className="text-xs text-text-secondary">Built with React · Vite · Tailwind · Framer Motion</div>
           </div>
-          <div className="text-xs text-text-secondary">Payments · Reliability · Platform Engineering</div>
+          <div className="text-xs text-text-secondary">Full-stack · AI agents · Reliability</div>
         </div>
       </div>
     </footer>

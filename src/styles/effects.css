@@ -1,0 +1,267 @@
+/*
+ * Showcase effects — heavy CSS / SCSS-flavour visual layers.
+ * Shared across the showcase home redesign. Keep in @layer-friendly order.
+ */
+
+/* === @property — animatable conic gradient angle === */
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+@property --hue {
+  syntax: '<number>';
+  initial-value: 0;
+  inherits: false;
+}
+
+/* === Conic gradient border (rotating neon trim) === */
+.fx-conic-border {
+  position: relative;
+  isolation: isolate;
+}
+.fx-conic-border::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(from var(--angle, 0deg),
+    rgba(126,123,217,0.85) 0deg,
+    rgba(214,156,47,0.55) 90deg,
+    rgba(126,123,217,0.85) 180deg,
+    rgba(214,156,47,0.55) 270deg,
+    rgba(126,123,217,0.85) 360deg);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: fx-spin 6s linear infinite;
+  z-index: -1;
+  pointer-events: none;
+}
+@keyframes fx-spin {
+  to { --angle: 360deg; }
+}
+
+/* === Glitch text — RGB split shimmer (hover) === */
+.fx-glitch {
+  position: relative;
+  display: inline-block;
+}
+.fx-glitch::before,
+.fx-glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+.fx-glitch::before { color: #7e7bd9; transform: translate(-1px, 0); }
+.fx-glitch::after  { color: #d69c2f; transform: translate(1px, 0); }
+.fx-glitch:hover::before {
+  opacity: 0.95;
+  animation: fx-glitch-x 700ms steps(8) infinite;
+}
+.fx-glitch:hover::after  {
+  opacity: 0.95;
+  animation: fx-glitch-x 530ms steps(7) infinite reverse;
+}
+@keyframes fx-glitch-x {
+  0%   { transform: translate(-2px, 0); }
+  20%  { transform: translate(2px, -1px); }
+  40%  { transform: translate(-1px, 1px); }
+  60%  { transform: translate(2px, 0); }
+  80%  { transform: translate(-2px, 1px); }
+  100% { transform: translate(0, 0); }
+}
+
+/* === Marquee row — endless scroll of badges === */
+.fx-marquee {
+  --duration: 38s;
+  display: flex;
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent 0, #000 8%, #000 92%, transparent 100%);
+}
+.fx-marquee__track {
+  display: flex;
+  gap: 1.25rem;
+  animation: fx-marquee var(--duration) linear infinite;
+  flex-shrink: 0;
+}
+.fx-marquee:hover .fx-marquee__track { animation-play-state: paused; }
+@keyframes fx-marquee {
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+/* === Scanline + CRT overlay === */
+.fx-scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(255,255,255,0.025) 0px,
+    rgba(255,255,255,0.025) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: overlay;
+  z-index: 1;
+}
+.fx-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 30%,
+    rgba(0,0,0,0.45) 100%
+  );
+  z-index: 1;
+}
+
+/* === Tilt card — used with JS to set --rx / --ry vars === */
+.fx-tilt {
+  transform-style: preserve-3d;
+  transition: transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
+}
+.fx-tilt:hover {
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateZ(0) scale(1.02);
+}
+.fx-tilt-shine {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    480px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255,255,255,0.18),
+    transparent 38%
+  );
+  opacity: 0;
+  transition: opacity 220ms ease;
+  mix-blend-mode: overlay;
+}
+.fx-tilt:hover .fx-tilt-shine { opacity: 1; }
+
+/* === Animated noise grain overlay === */
+.fx-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.5'/></svg>");
+}
+
+/* === Aurora text — animated gradient text === */
+.fx-aurora-text {
+  background: linear-gradient(
+    90deg,
+    #f5f1e3 0%,
+    #b3b1e6 25%,
+    #7e7bd9 50%,
+    #d69c2f 75%,
+    #f5f1e3 100%
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: fx-aurora 12s linear infinite;
+}
+@keyframes fx-aurora {
+  to { background-position: 300% 0; }
+}
+
+/* === Number counter with monospace === */
+.fx-stat-num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+}
+
+/* === Magnetic button — pointer-pull === */
+.fx-magnet {
+  transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
+}
+
+/* === Reveal line below text on hover === */
+.fx-underline-grow {
+  position: relative;
+}
+.fx-underline-grow::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  height: 1.5px;
+  width: 100%;
+  background: linear-gradient(90deg, #7e7bd9, #d69c2f);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.fx-underline-grow:hover::after { transform: scaleX(1); }
+
+/* === Custom cursor ring === */
+.fx-cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid rgba(126,123,217,0.7);
+  border-radius: 999px;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: difference;
+  transition: width 200ms ease, height 200ms ease, border-color 200ms ease;
+}
+.fx-cursor-ring--active {
+  width: 56px;
+  height: 56px;
+  border-color: rgba(214,156,47,0.85);
+}
+.fx-cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 6px;
+  background: #fff;
+  border-radius: 999px;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: difference;
+}
+
+/* === Glass with stronger reflection === */
+.fx-glass {
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 60%) ,
+    rgba(10,12,18,0.55);
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  border: 1px solid rgba(255,255,255,0.10);
+}
+
+/* === Stagger reveal — starts hidden, lifts on .is-visible === */
+.fx-reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 560ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              transform 560ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.fx-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
